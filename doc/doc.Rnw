@@ -36,8 +36,8 @@
 library(knitr)
 opts_chunk$set(echo=FALSE)
 
-#source('../src/common.r', chdir=TRUE)
-#data <- read_data(dir = '../scripts/')
+source('../src/common.r', chdir=TRUE)
+data <- read_data('../data/pima.txt')
 @
 
 \maketitle
