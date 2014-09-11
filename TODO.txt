@@ -1,0 +1,9 @@
+
+
+    Basic stuff (reading file)
+    Generating candidate (gini index, minLeaf filtering)
+PH  Functional tree-growing
+MV  R-way of tree-growing
+
+  Only split between consecutive rows with different class (optimization)
+  Comparing performance
