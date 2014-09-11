@@ -17,7 +17,9 @@ majority_class <- function(ys) {
 }
 
 # Empty list means there exists no valid split,
-# else the head of the list is an optimal split.
+# else return an optimal split.
+# Only return splits which improve the impurity, else we could loop forever (different class with same data)
 get_best_split <- function(xs, ys) {
     return(list())
+    # return(list(attr=,bnd=,xsl=,xsr=,ysl=,ysr=))
 }
