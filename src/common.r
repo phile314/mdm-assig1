@@ -48,16 +48,23 @@ majority_class <- function(ys) {
 #
 # Result
 #   A number representing the best split for the given input vectors,meaning 
-#   the split that minimize the impurity function.
+#   the split that minimizes the impurity function.
 #   If the vectors have length less than 2, NULL is returned.
 #
 bestsplit <- function (x, y){
-  # TODO is x and y sorted?
-  best = NULL
+  xy = data.frame(x,y)
+  sorted <- xy[order(xy$x), ] # TODO should I filter out duplicates?
+  x <- sorted$x
+  y <- sorted$y
+  bestSplit = NULL
+  bestRed = 0
   for (i in seq(x[1 : length(x)-1])){
-    pivot = mean(x[i : (i+1)])
-    candidate = impurity_reduction(pivot, x, y)
-    best = max(best, candidate)
+    split <- mean(x[i : (i+1)])
+    red <- impurity_reduction(split, x, y)
+    if (red >= bestRed) {
+      bestRed <- red
+      bestSplit <- split
+    }
   }
-  return (best)
+  return (bestSplit)
 } 
