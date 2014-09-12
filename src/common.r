@@ -1,3 +1,18 @@
+split <- function(s, x, y){
+  l = list("x" = x[x <= s], "y" = y[x <= s])
+  r = list("x" = x[x > s], "y" = y[x > s])
+  return(list("left" = l, "right" = r))
+}
+
+reduction <- function (s, x, y, i = gini_index){
+  nodes = split(s, x, y)
+  l = nodes$left$y
+  r = nodes$right$y
+  pl = length(l) / length(x)
+  pr = 1 - pl
+  return((i(l) * pl) + (i(r) * pr))
+}
+
 # Function: impurity_reduction
 #
 # Arguments:
@@ -12,14 +27,8 @@
 # A number representing the impurity reduction obtained using the
 # split s on x and y and the impurity function x.
 #
-impurity_reduction <- function (s, x, y, i = gini_index) {
-  l = y[x <= s]
-  r = y[x > s]
-  pl = length(l) / length(x)
-  pr = 1 - pl
-  delta = i(y) - (i(l) * pl) - (i(r) * pr) 
-  return (delta)
-}
+impurity_reduction <- function (s, x, y, i = gini_index)
+  return(i(y) - reduction(s, x, y, i))
 
 read_data <- function(fileName) {
     r.dat <- read.csv(fileName)
@@ -31,7 +40,7 @@ read_data <- function(fileName) {
 gini_index <- function(y) {
     n1 <- sum(y)
     n <- NROW(y)
-    return((n1/n) * (1 - (n1/n)))
+    return((n1 / n) * (1 - (n1 / n)))
 }
 
 majority_class <- function(y) {
@@ -41,37 +50,67 @@ majority_class <- function(y) {
       return(1)
     if (n1 * 2 < n)
       return(0)
-    return (sample(0:1,1))
+    return (sample(0:1, 1))
 }
 
-# Function: bestsplit
-#
-# Arguments
-#   x : Vector containing numerical values
-#   y : Vector containing binary class labels
-#
-# The two vectors have the same length.
-# This version adopts the brute version approach.
-#
-# Result
-#   A number representing the best split for the given input vectors,meaning 
-#   the split that minimizes the impurity function.
-#   If the vectors have length less than 2, NULL is returned.
-#
-best_split <- function (x, y){
+candidate_splits <- function(x, y){
   xy = data.frame(x,y)
   sorted <- xy[order(xy$x), ] # TODO should I filter out duplicates?
   x <- sorted$x
   y <- sorted$y
-  bestSplit = NULL
-  bestRed = 0
-  for (i in seq(x[1 : length(x)-1])){
-    split <- mean(x[i : (i+1)])
-    red <- impurity_reduction(split, x, y)
-    if (red >= bestRed) {
-      bestRed <- red
-      bestSplit <- split
+  candidates <- matrix(nrow = length(x) -1, ncol = 2)
+  for (i in seq((length(x)-1))){
+    s <- mean(x[i : (i+1)])
+    r <- impurity_reduction(s, x, y)
+    candidates[i, ] <- c(s, r)
+  }
+  return(candidates)
+}
+
+
+is_good_split <- function (nodes, minleaf) {
+  length(nodes$left$x) >= minleaf && length(nodes$right$x) >= minleaf
+}
+
+# Function: best_split
+#
+# Arguments
+#   x : Vector containing numerical values
+#   y : Vector containing binary class labels
+#   minleaf : The minimum number of observations required to consider a split acceptable
+#
+# The two vectors have the same length greater or equal than 2.
+# This version adopts the brute version approach.
+#
+# Result
+#   A list containing three elements:
+#     reduction : The impurity reduction produced by the returned split
+#     split : The numerical value that separates the observations
+#     nodes : A two element list containing the observations and the 
+#             correspondent class labels separated by split.
+#   NULL if no possible split satisfy the minleaf constraint.
+#
+best_split <- function (x, y, minleaf = 0){
+  best.split = NULL
+  best.reduction = 0
+  cs <- as.data.frame(candidate_splits(x, y))
+  colnames(cs) <- c('split', 'reduction')
+  candidates <- cs[order(cs$reduction),]
+  
+  for (r in seq(nrow(candidates))){
+    row = cs[r, ]
+    if (row$reduction >= best.reduction) {
+      nodes <- split(row$split, x, y)
+      if (is_good_split(nodes, minleaf)) {
+        best.reduction <- row$reduction
+        best.split <- row$split
+        best.nodes <- nodes
+      }
     }
   }
-  return (bestSplit)
-} 
+  if (is.null(best.split))
+    return(NULL)
+  return(list("split" = best.split, 
+              "reduction" = best.reduction, 
+              "nodes" = best.nodes))
+}
