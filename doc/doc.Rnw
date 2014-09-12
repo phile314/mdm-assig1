@@ -1,0 +1,66 @@
+\documentclass[12pt, a4paper, twoside]{report}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{subcaption}
+
+% font size could be 10pt (default), 11pt or 12 pt
+% paper size coulde be letterpaper (default), legalpaper, executivepaper,
+% a4paper, a5paper or b5paper
+% side coulde be oneside (default) or twoside 
+% columns coulde be onecolumn (default) or twocolumn
+% graphics coulde be final (default) or draft 
+%
+% titlepage coulde be notitlepage (default) or titlepage which 
+% makes an extra page for title 
+% 
+% paper alignment coulde be portrait (default) or landscape 
+%
+% equations coulde be 
+%   default number of the equation on the rigth and equation centered 
+%   leqno number on the left and equation centered 
+%   fleqn number on the rigth and  equation on the left side
+%   
+\title{MDM Assignment 1}
+\author{Marco Vassena  \\
+    4110161 \\
+    \and 
+    Philipp Hausmann \\
+    4003373 \\
+    }
+
+\date{\today} 
+\begin{document}
+
+<<setup, echo=FALSE, cache=FALSE,include=FALSE>>=
+library(knitr)
+opts_chunk$set(echo=FALSE)
+
+source('../src/common.r', chdir=TRUE)
+data <- read_data('../data/pima.txt')
+@
+
+\maketitle
+
+\tableofcontents
+
+\chapter{Problem description}
+The goal of this assignment is to implement and compare different classification models for the problem
+of letter recognition. The problem is particularly complex becuase the classification is based 
+on rather primitive numerical attributes extracted from raster scan images of the letters.
+The assignment is inspired by \cite{FS91}, whose data set has been used.
+
+
+\begin{thebibliography}{1}
+
+\bibitem{FS91}
+  Peter W. Frey, David J. Slate.
+  \emph{Letter Recognition Using Holland-Style Adaptive Classifier}.
+  Kluwer Academic Publishers,
+  Machine Learning, 6, 161-182(1991).
+  Tom Dietterich, Boston,
+  1991.
+
+\end{thebibliography}
+
+\end{document}

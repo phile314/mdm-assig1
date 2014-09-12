@@ -21,6 +21,13 @@ impurity_reduction <- function (s, x, y, i = gini_index) {
   return (delta)
 }
 
+read_data <- function(f) {
+    r.dat <- read.csv("../data/pima.txt")
+    r.dat.xs <- r.dat[,1:8]
+    r.dat.ys <- r.dat[,9]
+    return(list(dat=r.dat,xs=r.dat.xs,ys=r.dat.ys))
+}
+
 gini_index <- function(ys) {
     n1 <- sum(ys)
     n <- NROW(ys)
