@@ -21,7 +21,7 @@ tree.grow <- function(x, y, nmin, minleaf, impurity = gini_index){
     x.current <- x[current.samples,]
     if(impurity(y.current) > 0) { # || length(samples[current]) < nmin ){
       best <- best_of_best(x.current, y.current)
-      if (best == NULL)
+      if (is.null(best))
         next # TODO clean samples ? doesn't seem necessary
       left <- best$nodes$left
       right <- best$nodes$right
@@ -52,7 +52,7 @@ best_of_best <- function(attrs, y){
       best$col <- i
     }    
   }
-  if (best.col == 0)
+  if (best$col == 0)
     return(NULL)
   return(best)
 }
