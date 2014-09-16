@@ -39,10 +39,20 @@ tree.grow <- function(x, y, nmin, minleaf, impurity = gini_index){
 }
 
 # TODO better name
+# TODO repetition from best_split
 best_of_best <- function(attrs, y){
-  # for each attribute in x
-  # Compute best _split
-  # Pick up the best split among the best
-  # Return also the column number of the selected attribute
-  # NULL if all nulls 
+  candidates <- apply(attrs, c(2), best_split, y)
+  best <- list(reduction = 0, col = 0) 
+  for (i in seq(candidates)){
+    c <- candidates[[i]]
+    if (is.null(c))
+      next
+    if (c$reduction >= best$reduction){
+      best <- c
+      best$col <- i
+    }    
+  }
+  if (best.col == 0)
+    return(NULL)
+  return(best)
 }
