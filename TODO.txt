@@ -7,3 +7,10 @@ MV  R-way of tree-growing
 
   Only split between consecutive rows with different class (optimization)
   Comparing performance
+
+Questions
+  Efficient partitioning
+  Duplicate removal (I really think so)
+  We only pick up the best of best of each attribute:
+    Is the right thing to do?
+  Dealing with binary attributes
