@@ -16,7 +16,7 @@ tree.grow <- function(x, y, nmin, minleaf, impurity = gini_index){
   while(length(worklist) != 0){
     current.index <- worklist[[1]]
     worklist[[1]] <- NULL
-    current.samples <- samples[current.index]
+    current.samples <- samples[[current.index]]
     y.current <- y[current.samples]
     x.current <- x[current.samples,]
     if(impurity(y.current) > 0) { # || length(samples[current]) < nmin ){
@@ -35,7 +35,7 @@ tree.grow <- function(x, y, nmin, minleaf, impurity = gini_index){
       freeRow = freeRow + 2      
     }
   }
-  return(tree[1:(rowsUsed - 1), ])
+  return(tree[1:(freeRow - 1), ])
 }
 
 # TODO better name
