@@ -21,17 +21,22 @@ tree.grow <- function(x, y, nmin, minleaf, impurity = gini_index){
     x.current <- x[current.samples,]
     if(impurity(y.current) > 0) { # || length(samples[current]) < nmin ){
       best <- best_of_best(x.current, y.current)
+      
       if (is.null(best))
         next # TODO clean samples ? doesn't seem necessary
+
+      # Make leaves
       left <- best$nodes$left
       right <- best$nodes$right
-            
       tree[freeRow,] <- c(NA, NA, majority_class(left$y))
       tree[freeRow + 1,] <- c(NA, NA, majority_class(right$y)) # TODO should we always enforce two different class labels?! 
-      sample[[freeRow]] <- current.samples[x.current[best$col, ] <= best$split]
-      sample[[freeRow + 1]] <- current.samples[- (x.current[best$col, ] <= best$split)]
+      samples[[freeRow]] <- current.samples[x.current[, best$col] <= best$split]
+      samples[[freeRow + 1]] <- current.samples[(x.current[, best$col] > best$split)]
+
+      # Add children to current node
+      tree[current.index, ] <- c(freeRow, freeRow + 1, NA)
       
-      workinglist <- c(workinglist, freeRow, freeRow + 1)
+      worklist <- c(worklist, freeRow, freeRow + 1)
       freeRow = freeRow + 2      
     }
   }

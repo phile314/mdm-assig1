@@ -7,9 +7,11 @@ MV  R-way of tree-growing
 
   Only split between consecutive rows with different class (optimization)
   Comparing performance
-
   Fix case with only 1 attribute
-  Fix : Find subscripts when splitting
+
+Notes
+  When searching the best split, the segment border optimization cannot be 
+  used if the leafmin constraint is active.
 
 Questions
   Efficient partitioning
@@ -18,4 +20,4 @@ Questions
     Is the right thing to do?
   Dealing with binary attributes
   X is a matrix. Is it allowed to have only one  attribute (only one column)
-    I suppose so ... 
+    I suppose so ...
