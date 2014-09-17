@@ -1,13 +1,13 @@
+Before tuesday
 
-
-    Basic stuff (reading file)
-    Generating candidate (gini index, minLeaf filtering)
+    (Fix case with only 1 attribute)
+    Fix best_split for binary attributes
 PH  Functional tree-growing
 MV  R-way of tree-growing
+    Test with simple example files
 
   Only split between consecutive rows with different class (optimization)
   Comparing performance
-  Fix case with only 1 attribute
 
 Notes
   When searching the best split, the segment border optimization cannot be 
@@ -21,3 +21,6 @@ Questions
   Dealing with binary attributes
   X is a matrix. Is it allowed to have only one  attribute (only one column)
     I suppose so ...
+  Ask about corner case: Splits that do not improve the impurity might create
+  leaves that have the same label. Is this sensible? Or should we enforce that
+  they predict two different class labels.
