@@ -39,8 +39,24 @@ tree.grow <- function(x, y, nmin, minleaf, impurity = gini_index){
       tree[current.index, ] <- c(freeRow, freeRow + 1, NA, best$split, best$col)
       
       worklist <- c(worklist, freeRow, freeRow + 1)
-      freeRow = freeRow + 2      
+      freeRow <- freeRow + 2
     }
   }
   return(tree[1:(freeRow - 1), ])
 }
+
+tree.classify <- function (x, tr){
+  apply(x, 1, predict, tr)
+}
+
+is.leaf <- function(node) ! is.na(node$label)
+
+predict <- function(x, tr){
+  node <- tr[1, ]
+  while (!(is.leaf(node))){
+    succ <- if (x[node$splitCol] <= node$split) node$left else node$right
+    node <- tr[succ, ]
+  }
+  return(node$label)
+}
+  

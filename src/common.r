@@ -117,7 +117,7 @@ best_split <- function (x, y, minleaf = 0){
 # TODO better name
 # TODO repetition from best_split
 best_of_best <- function(attrs, y){
-  candidates <- apply(attrs, c(2), best_split, y)
+  candidates <- apply(attrs, 2, best_split, y)
   best <- list(reduction = 0, col = 0) 
   for (i in seq(candidates)){
     c <- candidates[[i]]
