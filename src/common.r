@@ -54,16 +54,17 @@ majority_class <- function(y) {
 }
 
 candidate_splits <- function(x, y){
-  xy = data.frame(x,y)
-  sorted <- xy[order(xy$x), ] # TODO should I filter out duplicates?
+  xy <- data.frame(x,y)
+  sorted <- xy[order(xy$x), ]
   x <- sorted$x
   y <- sorted$y
-  candidates <- matrix(nrow = length(x) -1, ncol = 2)
-  for (i in seq((length(x)-1))){
-    s <- mean(x[i : (i+1)])
-    r <- impurity_reduction(s, x, y)
-    candidates[i, ] <- c(s, r)
+
+  x.distinct <- unique(x)
+  splits <- list()
+  for (i in seq_len(length(x.distinct) - 1)){
+    splits[[i]] <- mean(x.distinct[i : (i + 1)])
   }
+  candidates <- t(vapply(splits, function(s) c(s, impurity_reduction(s, x, y)), FUN.VALUE = c(1,2)))
   return(candidates)
 }
 
@@ -95,9 +96,9 @@ best_split <- function (x, y, minleaf = 0){
   best.reduction = 0
   cs <- as.data.frame(candidate_splits(x, y))
   colnames(cs) <- c('split', 'reduction')
-  candidates <- cs[order(cs$reduction),]
+  candidates <- unique(cs[order(cs$reduction),])
   
-  for (r in seq(nrow(candidates))){
+  for (r in seq_len(nrow(candidates))){
     row = cs[r, ]
     if (row$reduction >= best.reduction) {
       nodes <- split(row$split, x, y)
@@ -110,6 +111,7 @@ best_split <- function (x, y, minleaf = 0){
   }
   if (is.null(best.split))
     return(NULL)
+  
   return(list("split" = best.split, 
               "reduction" = best.reduction, 
               "nodes" = best.nodes))
