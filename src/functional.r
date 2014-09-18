@@ -7,21 +7,22 @@ tree.functional.classify <- function(tr,xs) {
     apply(xs, 1, f)
 }
 
-tree.functional.grow <- function(xs, ys) {
+tree.functional.grow <- function(xs, ys, minleaf = 0) {
     maj <- majority_class(ys)
-    t <- tree.functional.growI(xs, ys, maj)
+    t <- tree.functional.growI(xs, ys, maj, minleaf)
     return(t)
 }
 
 # either split the given rows, or create a leaf node
-tree.functional.growI <- function(xs, ys, cls) {
-    sp <- get_best_split(xs, ys)
-    if (NROW(sp) == 0) {
+tree.functional.growI <- function(xs, ys, cls, minleaf) {
+    sp <- best_of_best(xs, ys, minleaf)
+    if (is.null(sp)) {
         return(mkLeaf(xs, ys, cls))
     } else {
-        l <- tree.functional.growI(sp[["xsl"]], sp[["xsr"]], 0)
-        r <- tree.functional.growI(sp[["ysl"]], sp[["ysr"]], 1)
-        return(mkNode(l, r, sp[["attr"]], sp[["bnd"]]))
+        obs <- sp[["nodes"]]
+        l <- tree.functional.growI(obs[["xsl"]],  obs[["ysl"]], 0, minleaf)
+        r <- tree.functional.growI(obs[["xsr"]], obs[["ysr"]], 1, minleaf)
+        return(mkNode(l, r, sp$col, sp$split))
     }
 }
 

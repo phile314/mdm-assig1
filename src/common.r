@@ -1,7 +1,16 @@
 split <- function(s, x, y){
   l = list("x" = x[x <= s], "y" = y[x <= s])
   r = list("x" = x[x > s], "y" = y[x > s])
-  return(list("left" = l, "right" = r))
+  isr = x > s
+  return(list("left" = l, "right" = r, "isRight" = isr))
+}
+
+split2 <- function(isRight, xs, ys) {
+  xsr = xs[isRight,]
+  xsl = xs[! isRight,]
+  ysr = ys[isRight]
+  ysl = ys[! isRight]
+  return(list("xsl" = xsl, "xsr" = xsr, "ysl"=ysl, "ysr"=ysr))
 }
 
 reduction <- function (s, x, y, i = gini_index){
@@ -84,8 +93,8 @@ is_good_split <- function (nodes, minleaf) {
 #   A list containing three elements:
 #     reduction : The impurity reduction produced by the returned split
 #     split : The numerical value that separates the observations
-#     nodes : A two element list containing the observations and the 
-#             correspondent class labels separated by split.
+#     isRight : A boolean vector, indicating for each row if
+#               it belongs to the right subtree or not.
 #   NULL if no possible split satisfy the minleaf constraint.
 #
 best_split <- function (x, y, minleaf = 0){
@@ -102,7 +111,7 @@ best_split <- function (x, y, minleaf = 0){
       if (is_good_split(nodes, minleaf)) {
         best.reduction <- row$reduction
         best.split <- row$split
-        best.nodes <- nodes
+        best.isRight = nodes$isRight
       }
     }
   }
@@ -110,14 +119,22 @@ best_split <- function (x, y, minleaf = 0){
     return(NULL)
   
   return(list("split" = best.split, 
-              "reduction" = best.reduction, 
-              "nodes" = best.nodes))
+              "reduction" = best.reduction,
+              "isRight" = best.isRight))
 }
 
 # TODO better name
-# TODO repetition from best_split
-best_of_best <- function(attrs, y){
-  candidates <- apply(attrs, 2, best_split, y)
+# Result
+#   A list containing the following elements or NULL:
+#     col : The index of the column to be splitted.
+#     split : The numerical value that seperates the observations.
+#     nodes$xsl : left rows of attrs
+#     nodes$xsr : right rows of attrs
+#     nodes$ysl : left rows of ys
+#     nodes$ysr : right rows of ys
+best_of_best <- function(attrs, ys, min_leaf = 0){
+  fbest <- function(a, b) best_split(a, b, min_leaf)
+  candidates <- apply(attrs, 2, fbest, ys)
   best <- list(reduction = 0, col = 0) 
   for (i in seq(candidates)){
     c <- candidates[[i]]
@@ -128,7 +145,11 @@ best_of_best <- function(attrs, y){
       best$col <- i
     }    
   }
-  if (best$col == 0)
+  if (best$col == 0) {
     return(NULL)
-  return(best)
+  } else {
+    nodes <- split2(best$isRight, attrs, ys)
+    best$nodes <- nodes
+    return(best)
+  }
 }
