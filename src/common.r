@@ -58,13 +58,10 @@ candidate_splits <- function(x, y){
   sorted <- xy[order(xy$x), ]
   x <- sorted$x
   y <- sorted$y
-
   x.distinct <- unique(x)
-  splits <- list()
-  for (i in seq_len(length(x.distinct) - 1)){
-    splits[[i]] <- mean(x.distinct[i : (i + 1)])
-  }
-  candidates <- t(vapply(splits, function(s) c(s, impurity_reduction(s, x, y)), FUN.VALUE = c(1,2)))
+  splits <- lapply(seq_len(length(x.distinct) - 1),
+                   function(i) mean(x.distinct[i : (i + 1)]))
+  candidates <- t(vapply(splits, function(s) c(s, impurity_reduction(s, x, y)), c(1,2)))
   return(candidates)
 }
 
