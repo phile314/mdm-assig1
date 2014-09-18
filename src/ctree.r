@@ -44,22 +44,3 @@ tree.grow <- function(x, y, nmin, minleaf, impurity = gini_index){
   }
   return(tree[1:(freeRow - 1), ])
 }
-
-# TODO better name
-# TODO repetition from best_split
-best_of_best <- function(attrs, y){
-  candidates <- apply(attrs, c(2), best_split, y)
-  best <- list(reduction = 0, col = 0) 
-  for (i in seq(candidates)){
-    c <- candidates[[i]]
-    if (is.null(c))
-      next
-    if (c$reduction >= best$reduction){
-      best <- c
-      best$col <- i
-    }    
-  }
-  if (best$col == 0)
-    return(NULL)
-  return(best)
-}
