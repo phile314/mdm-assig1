@@ -28,7 +28,7 @@ tree.grow <- function(x, y, nmin = 0, minleaf = 0, impurity = gini_index){
         next # TODO clean samples ? doesn't seem necessary
 
       obs <- partition(best$isRight, x.current, y.current)
-
+      
       # Make leaves
       left.index <- freeRow
       right.index <- freeRow + 1
@@ -36,8 +36,8 @@ tree.grow <- function(x, y, nmin = 0, minleaf = 0, impurity = gini_index){
       tree[right.index,] <- mkLeaf(obs$ysr) # TODO should we always enforce two different class labels?! 
 
       # Split samples
-      samples[[left.index]] <- current.samples[x.current[, best$index] <= best$split]
-      samples[[right.index]] <- current.samples[x.current[, best$index] > best$split]
+      samples[[left.index]] <- current.samples[!best$isRight]
+      samples[[right.index]] <- current.samples[best$isRight]
 
       # Add children to current node
       tree[current.index, ] <- mkNode(left.index, right.index, best)
