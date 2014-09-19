@@ -58,7 +58,7 @@ impurity_reduction <- function (s, x, y, i = gini_index)
 read_data <- function(fileName) {
     r.dat <- read.csv(fileName)
     nc <- dim(r.dat)[2]
-    r.dat.xs <- r.dat[,1:(nc - 1)]
+    r.dat.xs <- r.dat[,1:(nc - 1), drop = FALSE]
     r.dat.ys <- r.dat[,nc]
     return(list(dat=r.dat,xs=r.dat.xs,ys=r.dat.ys))
 }

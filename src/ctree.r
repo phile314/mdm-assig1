@@ -1,26 +1,26 @@
 source("common.r")
 
 tree.grow <- function(x, y, nmin = 0, minleaf = 0, impurity = gini_index){
+  # Initialization
   N <- length(y)
   tree <- data.frame(left = rep(NA,N),
                      right = rep(NA, N),
                      label = rep(NA,N), # logical? (binary classification)
                      split = rep(NA, N),
                      splitCol = rep(NA, N))
-
-  # Initialization
   tree[1, ] <- mkLeaf(y)
   worklist <- list(1)
   samples <- list()
   samples[[1]] <- 1:length(y)
   freeRow <- 2
-  
+
   while(length(worklist) != 0){
     current.index <- worklist[[1]]
     worklist <- worklist[-1]
     current.samples <- samples[[current.index]]
     y.current <- y[current.samples]
     x.current <- x[current.samples, , drop = FALSE]
+    
     if(impurity(y.current) > 0 && length(current.samples) >= nmin){
       best <- best.split.of.all(x.current, y.current, minleaf, impurity)
       
@@ -40,6 +40,7 @@ tree.grow <- function(x, y, nmin = 0, minleaf = 0, impurity = gini_index){
       # Add children to current node
       tree[current.index, ] <- mkNode(left.index, right.index, best)
       
+      # Control iteration
       worklist <- c(worklist, left.index, right.index)
       freeRow <- right.index + 1
     }
