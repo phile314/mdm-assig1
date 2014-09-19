@@ -15,8 +15,6 @@ tree.functional.grow <- function(xs, ys, nmin = 0, minleaf = 0) {
 
 # either split the given rows, or create a leaf node
 tree.functional.growI <- function(xs, ys, cls, nmin, minleaf) {
-    print(length(ys))
-    print(gini_index(ys))
     if (gini_index(ys) > 0 && length(ys) >= nmin) {
         sp <- best.split.of.all(xs, ys, minleaf)
         if (! is.null(sp)) {
