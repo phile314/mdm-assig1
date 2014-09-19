@@ -6,8 +6,8 @@ split <- function(s, x, y){
 }
 
 split2 <- function(isRight, xs, ys) {
-  xsr = xs[isRight,]
-  xsl = xs[! isRight,]
+  xsr = xs[isRight, , drop = FALSE]
+  xsl = xs[! isRight, , drop = FALSE]
   ysr = ys[isRight]
   ysl = ys[! isRight]
   return(list("xsl" = xsl, "xsr" = xsr, "ysl"=ysl, "ysr"=ysr))
