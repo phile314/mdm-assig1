@@ -66,9 +66,9 @@ read_data <- function(fileName, test, header = FALSE) {
     r.train <- r.dat[! isTest,]
 
     nc <- dim(r.dat)[2]
-    r.trxs <- r.train[,1:(nc - 1)]
+    r.trxs <- r.train[,1:(nc - 1), drop = FALSE]
     r.trys <- r.train[,nc]
-    r.texs <- r.test[,1:(nc-1)]
+    r.texs <- r.test[,1:(nc-1), drop = FALSE]
     r.teys <- r.test[,nc]
     return(list(dat=r.dat,trxs=r.trxs,trys=r.trys,texs=r.texs,teys=r.teys))
 }
