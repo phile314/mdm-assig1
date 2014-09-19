@@ -45,10 +45,21 @@ reduction <- function (s, x, y, i = gini_index){
 impurity_reduction <- function (s, x, y, i = gini_index)
   return(i(y) - reduction(s, x, y, i))
 
+# Function: read_data
+#
+# Arguments:
+#   fileName : The csv file to load. Last column is assumed to be class label.
+#
+# Result
+#   A list of
+#     dat : full dataset
+#     xs :  attribute values as matrix
+#     ys :  vector of class labels
 read_data <- function(fileName) {
     r.dat <- read.csv(fileName)
-    r.dat.xs <- r.dat[,1:8]
-    r.dat.ys <- r.dat[,9]
+    nc <- dim(r.dat)[2]
+    r.dat.xs <- r.dat[,1:(nc - 1)]
+    r.dat.ys <- r.dat[,nc]
     return(list(dat=r.dat,xs=r.dat.xs,ys=r.dat.ys))
 }
 
@@ -85,9 +96,9 @@ is_good_split <- function (nodes, minleaf) {
 }
 
 best.split <-function(s1, s2){
-  if (is.null(s1))
+  if (!"reduction" %in% names(s1))
     return(s2)
-  if(is.null(s2))
+  if(!"reduction" %in% names(s2))
     return(s1)
   best <- if (s1$reduction >= s2$reduction) s1 else s2
   return(best)
