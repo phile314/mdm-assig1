@@ -80,10 +80,35 @@ candidate_splits <- function(x, y){
   return(candidates)
 }
 
-
 is_good_split <- function (nodes, minleaf) {
   length(nodes$left$x) >= minleaf && length(nodes$right$x) >= minleaf
 }
+
+best.split <-function(s1, s2){
+  if (is.null(s1))
+    return(s2)
+  if(is.null(s2))
+    return(s1)
+  best <- if (s1$reduction >= s2$reduction) s1 else s2
+  return(best)
+}
+
+# Input a list of split objects.
+# Output 
+#   the split in the list with greater reduction, or NULL
+#   if the list is empty.
+#   The returned split is extended with a new field index containing its
+#   position in the list.
+best.split.among <- function(splits){
+  best <- NULL
+  for (i in seq(splits)){
+    splits[[i]]$index <- i
+    best <- best.split(best, splits[[i]])
+  }
+  return(best)
+}
+
+# TODO pass around implicity arguments
 
 # Function: best_split
 #
@@ -92,7 +117,7 @@ is_good_split <- function (nodes, minleaf) {
 #   y : Vector containing binary class labels
 #   minleaf : The minimum number of observations required to consider a split acceptable
 #
-# The two vectors have the same length greater or equal than 2.
+# The two vectors have the same length.
 # This version adopts the brute version approach.
 #
 # Result
@@ -103,51 +128,26 @@ is_good_split <- function (nodes, minleaf) {
 #               it belongs to the right subtree or not.
 #   NULL if no possible split satisfy the minleaf constraint.
 #
-best_split <- function (x, y, minleaf = 0){
-  best.split = NULL
-  best.reduction = 0
+best.split.on <- function (x, y, minleaf = 0){
   cs <- as.data.frame(candidate_splits(x, y))
   colnames(cs) <- c('split', 'reduction')
   candidates <- unique(cs[order(cs$reduction),])
-  
+  splits <- list()
   for (r in seq_len(nrow(candidates))){
-    row = cs[r, ]
-    if (row$reduction >= best.reduction) {
-      nodes <- split(row$split, x, y)
-      if (is_good_split(nodes, minleaf)) {
-        best.reduction <- row$reduction
-        best.split <- row$split
-        best.isRight = nodes$isRight
-      }
-    }
+    current <- as.list(cs[r, ])
+    nodes <- split(current$split, x, y)
+    if (is_good_split(nodes, minleaf))
+      splits[[r]] <- c(current, isRight = list(nodes$isRight))
   }
-  if (is.null(best.split))
-    return(NULL)
-  
-  return(list("split" = best.split, 
-              "reduction" = best.reduction,
-              "isRight" = best.isRight))
+  return(best.split.among(splits))
 }
 
-# TODO better name
 # Result
 #   A list containing the following elements or NULL:
 #     col : The index of the column to be splitted.
 #     split : The numerical value that seperates the observations.
-best_of_best <- function(attrs, ys, min_leaf = 0){
-  fbest <- function(a, b) best_split(a, b, min_leaf)
+best.split.of.all <- function(attrs, ys, min_leaf = 0){
+  fbest <- function(a, b) best.split.on(a, b, min_leaf)
   candidates <- apply(attrs, 2, fbest, ys)
-  best <- list(reduction = 0, col = 0) 
-  for (i in seq(candidates)){
-    c <- candidates[[i]]
-    if (is.null(c))
-      next
-    if (c$reduction >= best$reduction){
-      best <- c
-      best$col <- i
-    }    
-  }
-  if (best$col == 0)
-    return(NULL)
-  return(best)
+  return(best.split.among(candidates))
 }

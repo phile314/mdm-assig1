@@ -15,17 +15,16 @@ tree.functional.grow <- function(xs, ys, minleaf = 0) {
 
 # either split the given rows, or create a leaf node
 tree.functional.growI <- function(xs, ys, cls, minleaf) {
-    sp <- best_of_best(xs, ys, minleaf)
+    sp <- best.split.of.all(xs, ys, minleaf)
     if (is.null(sp)) {
         return(mkLeaf(xs, ys, cls))
     } else {
         obs <- partition(sp$isRight, xs, ys)
         l <- tree.functional.growI(obs[["xsl"]],  obs[["ysl"]], 0, minleaf)
         r <- tree.functional.growI(obs[["xsr"]], obs[["ysr"]], 1, minleaf)
-        return(mkNode(l, r, sp$col, sp$split))
+        return(mkNode(l, r, sp$index, sp$split))
     }
 }
-
 
 tree.functional.classifyI.leaf <- function(lf,x) {
     return(lf[["cls"]])
