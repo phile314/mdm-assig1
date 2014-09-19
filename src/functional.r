@@ -21,10 +21,10 @@ tree.functional.growI <- function(xs, ys, cls, nmin, minleaf) {
             obs <- partition(sp$isRight, xs, ys)
             l <- tree.functional.growI(obs$xsl, obs$ysl, majority_class(obs$ysl), nmin, minleaf)
             r <- tree.functional.growI(obs$xsr, obs$ysr, majority_class(obs$ysr), nmin, minleaf)
-            return(mkNode(l, r, sp$index, sp$split))
+            return(f_mkNode(l, r, sp$index, sp$split))
         }
     }
-    return(mkLeaf(xs, ys, cls))
+    return(f_mkLeaf(xs, ys, cls))
 }
 
 tree.functional.classifyI.leaf <- function(lf,x) {
@@ -40,13 +40,13 @@ tree.functional.classifyI.node <- function(nd,x) {
 }
 
 
-mkLeaf <- function(xs, ys, cl) {
+f_mkLeaf <- function(xs, ys, cl) {
     l <- list(cls=cl, datx=xs, daty=ys)
     class(l) <- "leaf"
     return(l)
 }
 
-mkNode <- function(l, r, attr, bnd) {
+f_mkNode <- function(l, r, attr, bnd) {
     n <- list(chldl=l, chldr=r, attr=attr, bnd=bnd)
     class(n) <- "node"
     return(n)
