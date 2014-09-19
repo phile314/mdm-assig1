@@ -21,7 +21,7 @@ tree.grow <- function(x, y, nmin, minleaf, impurity = gini_index){
     current.samples <- samples[[current.index]]
     y.current <- y[current.samples]
     x.current <- x[current.samples, , drop = FALSE]
-    if(impurity(y.current) > 0) { # || length(samples[current]) < nmin ){
+    if(impurity(y.current) > 0 && length(samples[current]) >= nmin ){
       best <- best.split.of.all(x.current, y.current)
       
       if (is.null(best))
