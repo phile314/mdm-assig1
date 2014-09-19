@@ -73,6 +73,14 @@ read_data <- function(fileName, test) {
     return(list(dat=r.dat,trxs=r.trxs,trys=r.trys,texs=r.texs,teys=r.teys))
 }
 
+read.data <- function(filename){
+    r.dat <- read.csv(filename)
+    nc <- dim(r.dat)[2]
+    r.dat.xs <- r.dat[,1:(nc - 1), drop = FALSE]
+    r.dat.ys <- r.dat[,nc]
+    return(list(dat=r.dat,xs=r.dat.xs,ys=r.dat.ys))
+}
+
 gini_index <- function(y) {
     n1 <- sum(y)
     n <- NROW(y)
