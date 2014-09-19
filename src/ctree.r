@@ -1,6 +1,6 @@
 source("common.r")
 
-tree.grow <- function(x, y, nmin, minleaf, impurity = gini_index){
+tree.grow <- function(x, y, nmin = 0, minleaf = 0, impurity = gini_index){
   N <- length(y)
   tree <- data.frame(left = rep(NA,N),
                      right = rep(NA, N),
@@ -21,7 +21,7 @@ tree.grow <- function(x, y, nmin, minleaf, impurity = gini_index){
     current.samples <- samples[[current.index]]
     y.current <- y[current.samples]
     x.current <- x[current.samples, , drop = FALSE]
-    if(impurity(y.current) > 0 && length(samples[current]) >= nmin ){
+    if(impurity(y.current) > 0 && length(current.samples) >= nmin ){
       best <- best.split.of.all(x.current, y.current)
       
       if (is.null(best))

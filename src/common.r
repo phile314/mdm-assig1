@@ -12,9 +12,9 @@ split <- function(s, x, y){
 #   ysl : left rows of ys
 #   ysr : right rows of ys
 partition <- function(isRight, xs, ys) {
-  xsr = xs[isRight, , drop = FALSE]
-  xsl = xs[! isRight, , drop = FALSE]
-  ysr = ys[isRight]
+  right.x = xs[isRight, , drop = FALSE]
+  left.x = xs[! isRight, , drop = FALSE]
+  right. = ys[isRight]
   ysl = ys[! isRight]
   return(list("xsl" = xsl, "xsr" = xsr, "ysl"=ysl, "ysr"=ysr))
 }
