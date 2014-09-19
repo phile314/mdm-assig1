@@ -49,18 +49,28 @@ impurity_reduction <- function (s, x, y, i = gini_index)
 #
 # Arguments:
 #   fileName : The csv file to load. Last column is assumed to be class label.
+#   test     : percent of rows to use for testing
 #
 # Result
 #   A list of
 #     dat : full dataset
-#     xs :  attribute values as matrix
-#     ys :  vector of class labels
-read_data <- function(fileName) {
+#     trxs :  attribute values as matrix, training
+#     trys :  vector of class labels,     training
+#     texs :  attribute values as matrix, test
+#     teys :  vector of class labels,     test
+read_data <- function(fileName, test) {
     r.dat <- read.csv(fileName)
+
+    isTest <- runif(dim(r.dat)[1]) < test
+    r.test <- r.dat[isTest,]
+    r.train <- r.dat[! isTest,]
+
     nc <- dim(r.dat)[2]
-    r.dat.xs <- r.dat[,1:(nc - 1), drop = FALSE]
-    r.dat.ys <- r.dat[,nc]
-    return(list(dat=r.dat,xs=r.dat.xs,ys=r.dat.ys))
+    r.trxs <- r.train[,1:(nc - 1), drop = FALSE]
+    r.trys <- r.train[,nc]
+    r.texs <- r.test[,1:(nc-1), drop = FALSE]
+    r.teys <- r.test[,nc]
+    return(list(dat=r.dat,trxs=r.trxs,trys=r.trys,texs=r.texs,teys=r.teys))
 }
 
 gini_index <- function(y) {
