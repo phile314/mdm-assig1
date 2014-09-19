@@ -19,8 +19,8 @@ tree.functional.growI <- function(xs, ys, cls, nmin, minleaf) {
         sp <- best.split.of.all(xs, ys, minleaf)
         if (! is.null(sp)) {
             obs <- partition(sp$isRight, xs, ys)
-            l <- tree.functional.growI(obs$xsl, obs$ysl, majority_class(obs$ysl), nmin, minleaf)
-            r <- tree.functional.growI(obs$xsr, obs$ysr, majority_class(obs$ysr), nmin, minleaf)
+            l <- tree.functional.growI(obs$left.x, obs$left.y, majority_class(obs$left.y), nmin, minleaf)
+            r <- tree.functional.growI(obs$right.x, obs$right.y, majority_class(obs$right.y), nmin, minleaf)
             return(f_mkNode(l, r, sp$index, sp$split))
         }
     }

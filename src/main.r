@@ -1,6 +1,7 @@
 
 source("common.r")
 source("ctree.r")
+source("functional.r")
 
 test.pima <- function(){
   pima <- read_data("../data/pima.txt", 0)

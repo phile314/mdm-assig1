@@ -7,16 +7,16 @@ split <- function(s, x, y){
 
 # Result
 # A list containing the following named fields:
-#   xsl : left rows of attrs
-#   xsr : right rows of attrs
-#   ysl : left rows of ys
-#   ysr : right rows of ys
-partition <- function(isRight, xs, ys) {
-  xsr = xs[isRight, , drop = FALSE]
-  xsl = xs[! isRight, , drop = FALSE]
-  ysr = ys[isRight]
-  ysl = ys[! isRight]
-  return(list("xsl" = xsl, "xsr" = xsr, "ysl"=ysl, "ysr"=ysr))
+#   left.x : left rows of x
+#   right.x : right rows of x
+#   left.y : left rows of y
+#   right.y : right rows of y
+partition <- function(isRight, x, y) {
+  rx = x[isRight, , drop = FALSE]
+  lx = x[! isRight, , drop = FALSE]
+  ry = y[isRight]
+  ly = y[! isRight]
+  return(list(left.x = lx, right.x = rx, left.y = ly, right.y = ry))
 }
 
 reduction <- function (s, x, y, i = gini_index){

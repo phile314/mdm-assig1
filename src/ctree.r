@@ -32,8 +32,8 @@ tree.grow <- function(x, y, nmin = 0, minleaf = 0, impurity = gini_index){
       # Make leaves
       left.index <- freeRow
       right.index <- freeRow + 1
-      tree[left.index ,] <- mkLeaf(obs$ysl)
-      tree[right.index,] <- mkLeaf(obs$ysr) # TODO should we always enforce two different class labels?! 
+      tree[left.index ,] <- mkLeaf(obs$left.y)
+      tree[right.index,] <- mkLeaf(obs$right.y) # TODO should we always enforce two different class labels?! 
 
       # Split samples
       samples[[left.index]] <- current.samples[!best$isRight]
