@@ -17,12 +17,12 @@ tree.grow <- function(x, y, nmin = 0, minleaf = 0, impurity = gini_index){
   
   while(length(worklist) != 0){
     current.index <- worklist[[1]]
-    worklist[[1]] <- NULL
+    worklist <- worklist[-1]
     current.samples <- samples[[current.index]]
     y.current <- y[current.samples]
     x.current <- x[current.samples, , drop = FALSE]
-    if(impurity(y.current) > 0 && length(current.samples) >= nmin ){
-      best <- best.split.of.all(x.current, y.current)
+    if(impurity(y.current) > 0 && length(current.samples) >= nmin){
+      best <- best.split.of.all(x.current, y.current, minleaf, impurity)
       
       if (is.null(best))
         next # TODO clean samples ? doesn't seem necessary
@@ -33,6 +33,7 @@ tree.grow <- function(x, y, nmin = 0, minleaf = 0, impurity = gini_index){
       tree[left.index ,] <- mkLeaf(best$nodes$left$y)
       tree[right.index,] <- mkLeaf(best$nodes$right$y) # TODO should we always enforce two different class labels?! 
 
+      # Split samples
       samples[[left.index]] <- current.samples[!best$isRight]
       samples[[right.index]] <- current.samples[best$isRight]
 
@@ -52,11 +53,11 @@ mkNode <- function (left.index, right.index, best) {
   c(left.index, right.index, NA, best$split, best$index)
 }
 
-tree.classify <- function (x, tr){
+tree.classify <- function (x, tr) {
   apply(x, 1, predict, tr)
 }
 
-is.leaf <- function(node) ! is.na(node$label)
+is.leaf <- function(node) (! is.na(node$label))
 
 predict <- function(x, tr){
   node <- tr[1, ]

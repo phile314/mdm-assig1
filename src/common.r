@@ -12,9 +12,9 @@ split <- function(s, x, y){
 #   ysl : left rows of ys
 #   ysr : right rows of ys
 partition <- function(isRight, xs, ys) {
-  right.x = xs[isRight, , drop = FALSE]
-  left.x = xs[! isRight, , drop = FALSE]
-  right. = ys[isRight]
+  xsr = xs[isRight, , drop = FALSE]
+  xsl = xs[! isRight, , drop = FALSE]
+  ysr = ys[isRight]
   ysl = ys[! isRight]
   return(list("xsl" = xsl, "xsr" = xsr, "ysl"=ysl, "ysr"=ysr))
 }
@@ -79,7 +79,7 @@ majority_class <- function(y) {
     return (sample(0:1, 1))
 }
 
-candidate_splits <- function(x, y){
+candidate_splits <- function(x, y, impurity = gini_index){
   xy <- data.frame(x,y)
   sorted <- xy[order(xy$x), ]
   x <- sorted$x
@@ -87,7 +87,9 @@ candidate_splits <- function(x, y){
   x.distinct <- unique(x)
   splits <- lapply(seq_len(length(x.distinct) - 1),
                    function(i) mean(x.distinct[i : (i + 1)]))
-  candidates <- t(vapply(splits, function(s) c(s, impurity_reduction(s, x, y)), c(1,2)))
+  
+  with.impurity <- function(s) c(s, impurity_reduction(s, x, y, impurity))
+  candidates <- t(vapply(splits, with.impurity , c(1,2)))
   return(candidates)
 }
 
@@ -139,8 +141,8 @@ best.split.among <- function(splits){
 #               it belongs to the right subtree or not.
 #   NULL if no possible split satisfy the minleaf constraint.
 #
-best.split.on <- function (x, y, minleaf = 0){
-  cs <- as.data.frame(candidate_splits(x, y))
+best.split.on <- function (x, y, minleaf = 0, impurity = gini_index){
+  cs <- as.data.frame(candidate_splits(x, y, impurity))
   colnames(cs) <- c('split', 'reduction')
   candidates <- unique(cs[order(cs$reduction),])
   splits <- list()
@@ -157,8 +159,8 @@ best.split.on <- function (x, y, minleaf = 0){
 #   A list containing the following elements or NULL:
 #     col : The index of the column to be splitted.
 #     split : The numerical value that seperates the observations.
-best.split.of.all <- function(attrs, ys, min_leaf = 0){
-  fbest <- function(a, b) best.split.on(a, b, min_leaf)
+best.split.of.all <- function(attrs, ys, minleaf = 0, impurity = gini_index){
+  fbest <- function(a, b) best.split.on(a, b, minleaf, impurity)
   candidates <- apply(attrs, 2, fbest, ys)
   return(best.split.among(candidates))
 }
