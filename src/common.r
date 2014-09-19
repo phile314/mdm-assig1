@@ -1,11 +1,17 @@
 split <- function(s, x, y){
-  l = list("x" = x[x <= s], "y" = y[x <= s])
-  r = list("x" = x[x > s], "y" = y[x > s])
-  isr = x > s
-  return(list("left" = l, "right" = r, "isRight" = isr))
+  isRight = x > s
+  l = list(x = x[! isRight], y = y[! isRight])
+  r = list(x = x[isRight]  , y = y[isRight])
+  return(list(left = l, right = r, isRight = isRight))
 }
 
-split2 <- function(isRight, xs, ys) {
+# Result
+# A list containing the following named fields:
+#   xsl : left rows of attrs
+#   xsr : right rows of attrs
+#   ysl : left rows of ys
+#   ysr : right rows of ys
+partition <- function(isRight, xs, ys) {
   xsr = xs[isRight, , drop = FALSE]
   xsl = xs[! isRight, , drop = FALSE]
   ysr = ys[isRight]
@@ -128,10 +134,6 @@ best_split <- function (x, y, minleaf = 0){
 #   A list containing the following elements or NULL:
 #     col : The index of the column to be splitted.
 #     split : The numerical value that seperates the observations.
-#     nodes$xsl : left rows of attrs
-#     nodes$xsr : right rows of attrs
-#     nodes$ysl : left rows of ys
-#     nodes$ysr : right rows of ys
 best_of_best <- function(attrs, ys, min_leaf = 0){
   fbest <- function(a, b) best_split(a, b, min_leaf)
   candidates <- apply(attrs, 2, fbest, ys)
@@ -145,11 +147,7 @@ best_of_best <- function(attrs, ys, min_leaf = 0){
       best$col <- i
     }    
   }
-  if (best$col == 0) {
+  if (best$col == 0)
     return(NULL)
-  } else {
-    nodes <- split2(best$isRight, attrs, ys)
-    best$nodes <- nodes
-    return(best)
-  }
+  return(best)
 }

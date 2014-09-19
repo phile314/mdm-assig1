@@ -19,7 +19,7 @@ tree.functional.growI <- function(xs, ys, cls, minleaf) {
     if (is.null(sp)) {
         return(mkLeaf(xs, ys, cls))
     } else {
-        obs <- sp[["nodes"]]
+        obs <- partition(sp$isRight, xs, ys)
         l <- tree.functional.growI(obs[["xsl"]],  obs[["ysl"]], 0, minleaf)
         r <- tree.functional.growI(obs[["xsr"]], obs[["ysr"]], 1, minleaf)
         return(mkNode(l, r, sp$col, sp$split))

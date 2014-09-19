@@ -9,6 +9,8 @@ MV  R-way of tree-growing
   Only split between consecutive rows with different class (optimization)
   Comparing performance
 
+  Consistency in names of vectors and matrix
+
 Notes
   When searching the best split, the segment border optimization cannot be 
   used if the leafmin constraint is active.
