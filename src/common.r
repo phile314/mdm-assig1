@@ -96,9 +96,9 @@ is_good_split <- function (nodes, minleaf) {
 }
 
 best.split <-function(s1, s2){
-  if (is.null(s1))
+  if (!"reduction" %in% names(s1))
     return(s2)
-  if(is.null(s2))
+  if(!"reduction" %in% names(s2))
     return(s1)
   best <- if (s1$reduction >= s2$reduction) s1 else s2
   return(best)
