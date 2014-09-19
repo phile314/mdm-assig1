@@ -58,8 +58,8 @@ impurity_reduction <- function (s, x, y, i = gini_index)
 #     trys :  vector of class labels,     training
 #     texs :  attribute values as matrix, test
 #     teys :  vector of class labels,     test
-read_data <- function(fileName, test) {
-    r.dat <- read.csv(fileName)
+read_data <- function(fileName, test, header = FALSE) {
+    r.dat <- read.csv(fileName, header)
 
     isTest <- runif(dim(r.dat)[1]) < test
     r.test <- r.dat[isTest,]
