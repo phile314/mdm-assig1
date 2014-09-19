@@ -9,10 +9,10 @@ tree.grow <- function(x, y, nmin, minleaf, impurity = gini_index){
                      splitCol = rep(NA, N))
 
   # Initialization
-  tree[1, ] <- c(NA, NA, majority_class(y), NA, NA)
+  tree[1, ] <- mkLeaf(y)
   worklist <- list(1)
-  samples = list()
-  samples[[1]] = 1:length(y)
+  samples <- list()
+  samples[[1]] <- 1:length(y)
   freeRow <- 2
   
   while(length(worklist) != 0){
@@ -28,21 +28,28 @@ tree.grow <- function(x, y, nmin, minleaf, impurity = gini_index){
         next # TODO clean samples ? doesn't seem necessary
 
       # Make leaves
-      left <- best$nodes$left
-      right <- best$nodes$right
-      tree[freeRow,] <- c(NA, NA, majority_class(left$y), NA, NA)
-      tree[freeRow + 1,] <- c(NA, NA, majority_class(right$y), NA, NA) # TODO should we always enforce two different class labels?! 
-      samples[[freeRow]] <- current.samples[x.current[, best$index] <= best$split]
-      samples[[freeRow + 1]] <- current.samples[(x.current[, best$index] > best$split)]
+      left.index <- freeRow
+      right.index <- freeRow + 1
+      tree[left.index ,] <- mkLeaf(best$nodes$left$y)
+      tree[right.index,] <- mkLeaf(best$nodes$right$y) # TODO should we always enforce two different class labels?! 
+
+      samples[[left.index]] <- current.samples[!best$isRight]
+      samples[[right.index]] <- current.samples[best$isRight]
 
       # Add children to current node
-      tree[current.index, ] <- c(freeRow, freeRow + 1, NA, best$split, best$index)
+      tree[current.index, ] <- mkNode(left.index, right.index, best)
       
-      worklist <- c(worklist, freeRow, freeRow + 1)
-      freeRow <- freeRow + 2
+      worklist <- c(worklist, left.index, right.index)
+      freeRow <- right.index + 1
     }
   }
   return(tree[1:(freeRow - 1), ])
+}
+
+mkLeaf <- function(y) c(NA, NA, majority_class(y), NA, NA)
+
+mkNode <- function (left.index, right.index, best) {
+  c(left.index, right.index, NA, best$split, best$index)
 }
 
 tree.classify <- function (x, tr){
@@ -59,4 +66,3 @@ predict <- function(x, tr){
   }
   return(node$label)
 }
-  
