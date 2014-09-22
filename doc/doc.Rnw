@@ -1,4 +1,4 @@
-\documentclass[12pt, a4paper, twoside]{report}
+\documentclass[12pt, a4paper, oneside]{report}
 \usepackage{hyperref}
 \usepackage{amsmath}
 \usepackage{multirow}
@@ -37,18 +37,63 @@ library(knitr)
 opts_chunk$set(echo=FALSE)
 
 source('../src/common.r', chdir=TRUE)
-data <- read_data('../data/pima.txt')
+pima <- read_data('../data/pima.txt', 0.0)
+
+nrep <- 1
+source('../src/functional.r', chdir=TRUE)
+source('../src/ctree.r', chdir=TRUE)
 @
 
 \maketitle
 
 \tableofcontents
 
-\chapter{Problem description}
-The goal of this assignment is to implement and compare different classification models for the problem
-of letter recognition. The problem is particularly complex becuase the classification is based 
-on rather primitive numerical attributes extracted from raster scan images of the letters.
-The assignment is inspired by \cite{FS91}, whose data set has been used.
+
+\section{Problem description}
+The goal of this assignment is to implement and evaluate a tree classification algorithm.
+In addition to that, we will also discuss two different implementation styles
+and their performance implications.
+
+\section{Implementations}
+We created two implementations of the algorithm. The first one is idiomatic R code,
+whereas the second one is inspired by what a functional implementation looks like.
+Both algorithms produce the same results, they may only differ performance-wise.
+\subsection{Basic Functions}
+First, we would like to discuss the functions common to both implementations.
+TODO ...
+\subsection{R Style}
+\subsection{Functional Style}
+The functional style version encodes the tree by simulating objects in R. We
+would like to note that R is not perfectly suited for this approach, but it
+should give some indications how such an approach compares in term of
+performance to a more procedural/imperative approach. The source code can
+be found in the file \texttt{functional.r}.
+
+The implementation basically uses recursion to construct the tree, which happens
+in the \texttt{tree.functional.grow} function. A nice side effect of the functional
+approach is, that the tree is never modified and the recursive approach could easily
+be parallelized (in general, not necessarily in R).
+
+\section{Results}
+\subsection{Performance comparison}
+\begin{figure}[!ht]
+<<perf-comp,fig.keep='high',cache=FALSE>>=
+ti_fu_gr <- system.time(replicate(nrep, tree.functional.grow(pima$trxs, pima$trys)))["elapsed"]
+ti_im_gr <- system.time(replicate(nrep, tree.grow(pima$trxs, pima$trys)))["elapsed"]
+
+fu_t <- tree.functional.grow(pima$trxs, pima$trys)
+im_t <- tree.grow(pima$trxs, pima$trys)
+
+ti_fu_pr <- system.time(replicate(nrep, tree.functional.classify(fu_t, pima$trxs)))["elapsed"]
+ti_im_pr <- 0 #TODO broken system.time(replicate(nrep, tree.classify(im_t, pima$trxs)))["elapsed"]
+
+barplot(c(ti_fu_gr, ti_im_gr, ti_fu_pr, ti_im_pr), names.arg = c("grow functional", "grow imperative", "predict functional", "predict imperative"))
+@
+\end{figure}
+
+\subsection{Parameter search}
+sdf
+
 
 
 \begin{thebibliography}{1}
