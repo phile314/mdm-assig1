@@ -84,8 +84,8 @@ ti_im_gr <- system.time(replicate(nrep, tree.grow(pima$trxs, pima$trys)))["elaps
 fu_t <- tree.functional.grow(pima$trxs, pima$trys)
 im_t <- tree.grow(pima$trxs, pima$trys)
 
-ti_fu_pr <- system.time(replicate(nrep, tree.functional.classify(fu_t, pima$trxs)))["elapsed"]
-ti_im_pr <- 0 #TODO broken system.time(replicate(nrep, tree.classify(im_t, pima$trxs)))["elapsed"]
+ti_fu_pr <- system.time(replicate(nrep, tree.functional.classify(pima$trxs, fu_t)))["elapsed"]
+ti_im_pr <- system.time(replicate(nrep, tree.classify(pima$trxs, im_t)))["elapsed"]
 
 barplot(c(ti_fu_gr, ti_im_gr, ti_fu_pr, ti_im_pr), names.arg = c("grow functional", "grow imperative", "predict functional", "predict imperative"))
 @

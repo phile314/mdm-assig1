@@ -15,23 +15,23 @@ tree.functional.classifyI <- function(tr,x) UseMethod("tree.functional.classifyI
 # Function: tree.functional.classify
 #
 # Arguments:
+#   x  : A matrix containing the attribute values, one row for each observation.
 #   tr : The tree to use for predicting.
-#   xs  : A matrix containing the attribute values, one row for each observation.
 #
 # Result
 # Vector of the predicted class labels (either 0 or 1).
 #
 # Predicts the class label of some observations.
-tree.functional.classify <- function(tr,xs) {
-    f <- function(x) tree.functional.classifyI(tr, x)
-    apply(xs, 1, f)
+tree.functional.classify <- function(x,tr) {
+    f <- function(z) tree.functional.classifyI(tr, z)
+    apply(x, 1, f)
 }
 
 # Function: tree.functional.grow
 #
 # Arguments:
-#   xs  : A matrix containing the attribute values, one row for each observation.
-#   ys  : Vector with the class labels.
+#   x   : A matrix containing the attribute values, one row for each observation.
+#   y   : Vector with the class labels.
 #   nmin: Minimal number of obs. required to split a leaf.
 #   minleaf: Minimal number of obs. required in new leafs.
 #
@@ -39,17 +39,17 @@ tree.functional.classify <- function(tr,xs) {
 # The tree.
 #
 # Grows a tree from a data set.
-tree.functional.grow <- function(xs, ys, nmin = 0, minleaf = 0) {
-    maj <- majority_class(ys)
-    t <- tree.functional.growI(xs, ys, maj, nmin, minleaf)
+tree.functional.grow <- function(x, y, nmin = 0, minleaf = 0) {
+    maj <- majority_class(y)
+    t <- tree.functional.growI(x, y, maj, nmin, minleaf)
     return(t)
 }
 
 # Function: tree.functional.growI
 #
 # Arguments:
-#   xs  : A matrix containing the attribute values, one row for each observation.
-#   ys  : Vector with the class labels.
+#   x   : A matrix containing the attribute values, one row for each observation.
+#   y   : Vector with the class labels.
 #   cls : The class label to predict for the given data set, if no split can be made.
 #   nmin: Minimal number of obs. required to split a leaf.
 #   minleaf: Minimal number of obs. required in new leafs.
@@ -60,18 +60,18 @@ tree.functional.grow <- function(xs, ys, nmin = 0, minleaf = 0) {
 # in a parameter cls.
 #
 # Grows a (sub)tree from a data set.
-tree.functional.growI <- function(xs, ys, cls, nmin, minleaf) {
-    if (gini_index(ys) > 0 && length(ys) >= nmin) {
-        sp <- best.split.of.all(xs, ys, minleaf)
+tree.functional.growI <- function(x, y, cls, nmin, minleaf) {
+    if (gini_index(y) > 0 && length(y) >= nmin) {
+        sp <- best.split.of.all(x, y, minleaf)
         if (! is.null(sp)) {
-            obs <- partition(sp$isRight, xs, ys)
+            obs <- partition(sp$isRight, x, y)
             # the left/right subtree could be visited in parallel
             l <- tree.functional.growI(obs$left.x, obs$left.y, majority_class(obs$left.y), nmin, minleaf)
             r <- tree.functional.growI(obs$right.x, obs$right.y, majority_class(obs$right.y), nmin, minleaf)
             return(f_mkNode(l, r, sp$index, sp$split))
         }
     }
-    return(f_mkLeaf(xs, ys, cls))
+    return(f_mkLeaf(x, y, cls))
 }
 
 # Function: tree.functional.classifyI.leaf
@@ -98,7 +98,7 @@ tree.functional.classifyI.leaf <- function(lf,x) {
 # The class label.
 #
 # Returns the class label predicted by this (sub)tree.
-tree.functional.classifyI.node <- function(nd,x) {
+tree.functional.classifyI.node <- function(nd, x) {
     if(x[nd[["attr"]]] <= nd[["bnd"]]) {
         return(tree.functional.classifyI(nd[["chldl"]], x))
     } else {
@@ -109,16 +109,16 @@ tree.functional.classifyI.node <- function(nd,x) {
 # Function: f_mkLeaf
 #
 # Arguments:
-#   xs  : A matrix containing the attribute values, one row for each observation.
-#   ys  : Vector with the class labels.
+#   x   : A matrix containing the attribute values, one row for each observation.
+#   y   : Vector with the class labels.
 #   cl  : Class of the leaf node.
 #
 # Result
 # A leaf node.
 #
 # Creates a leaf.
-f_mkLeaf <- function(xs, ys, cl) {
-    l <- list(cls=cl, datx=xs, daty=ys)
+f_mkLeaf <- function(x, y, cl) {
+    l <- list(cls=cl, datx=x, daty=y)
     class(l) <- "leaf"
     return(l)
 }
