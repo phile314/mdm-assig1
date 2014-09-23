@@ -1,28 +1,48 @@
-Before tuesday
+Before Thursday
 
-    (Fix case with only 1 attribute)
-    Fix best_split for binary attributes
-PH  Functional tree-growing
-MV  R-way of tree-growing
-    Test with simple example files
+MV       Report about imperative version
+MV       Add documentation to ctree.r
+MV/PH    Finish documentation for common.r
+MV       Look why prediction performs worse for imperative
+MV/PH    Look for suitable data set
+
 
   Only split between consecutive rows with different class (optimization)
   Comparing performance
 
   Consistency in names of vectors and matrix
 
+After Thursday
+  Parameters
+  Describe the analysis
+
+Data analysis
+  Leave out combinations of parameters in which
+    nmin <= 2 * minleaf
+  Because the second implies the first
+
 Notes
   When searching the best split, the segment border optimization cannot be 
   used if the leafmin constraint is active.
 
 Questions
-  Efficient partitioning
-  Duplicate removal (I really think so)
+  Efficient partitioning (slicing)
   We only pick up the best of best of each attribute:
     Is the right thing to do?
-  Dealing with binary attributes
-  X is a matrix. Is it allowed to have only one  attribute (only one column)
-    I suppose so ...
   Ask about corner case: Splits that do not improve the impurity might create
   leaves that have the same label. Is this sensible? Or should we enforce that
   they predict two different class labels.
+
+  We think all the configurations in which
+    nmin <= 2 * minleaf
+  will have the same error rate.
+  Do you agree?
+  Due to this they are not independent.
+  But still how should we search for the best configuration?
+  Are there guidelines about how choosing those?
+  E.G
+    Should we first look for the best leafmin and then consider minleaf?
+    The other way around?
+
+  Does it need to be all in one single file?
+
