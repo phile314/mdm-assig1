@@ -32,7 +32,7 @@
 \date{\today} 
 \begin{document}
 
-<<setup, echo=FALSE, cache=FALSE,include=FALSE>>=
+<<setup, echo=FALSE, cache=TRUE,include=FALSE>>=
 library(knitr)
 opts_chunk$set(echo=FALSE)
 
@@ -60,10 +60,23 @@ and their performance implications.
 We created two implementations of the algorithm. The first one is idiomatic R code,
 whereas the second one is inspired by what a functional implementation looks like.
 Both algorithms produce the same results, they may only differ performance-wise.
+
 \subsection{Basic Functions}
 First, we would like to discuss the functions common to both implementations.
-TODO ...
-\subsection{R Style}
+The file \texttt{common.r} contains procedures shared between the two implementations.
+
+  Binary attributes considered as numerical
+  No optimization in best.split.on due to the nmin constraint
+
+\subsection{Imperative/R Style}
+The classification tree is implemented as a non-empty data frame with the following columns: \texttt{left}, \texttt{right}, \texttt{label}, \texttt{split}, \texttt{splitCol}. Each row represents either a leaf or an internal node and the first row is the root of the tree.
+The \texttt{leaf} and \texttt{right} field of a node row contains the index of the row of the same data frame at which the correspondent left and right child is to be found.
+The \texttt{split} and \texttt{splitCol} are used by the classify procedure. The first is the threshold value
+and the second is the column number of the attribute referred by the first.
+The field \texttt{label} is set to \texttt{na} for node rows.
+Leaves nodes fields are all set to \texttt{na} except for \texttt{label} which contains the predicted class label (0 or 1), computed using majority vote. Ties are broken at random.
+The related source code can be found in the file \texttt{ctree.r}.
+
 \subsection{Functional Style}
 The functional style version encodes the tree by simulating objects in R. We
 would like to note that R is not perfectly suited for this approach, but it
@@ -89,7 +102,7 @@ im_t <- tree.grow(dat_perf$trxs, dat_perf$trys, 5, 5)
 ti_fu_pr <- system.time(replicate(nrep, tree.functional.classify(dat_perf$trxs, fu_t)))["elapsed"]
 ti_im_pr <- system.time(replicate(nrep, tree.classify(dat_perf$trxs, im_t)))["elapsed"]
 @
-<<perf-comp-plot,fig.keep='high',cache=FALSE>>=
+<<perf-comp-plot,fig.keep='high',cache=FALSE,echo=FALSE>>=
 barplot(c(ti_fu_gr, ti_im_gr, ti_fu_pr, ti_im_pr), names.arg = c("grow functional", "grow imperative", "predict functional", "predict imperative"))
 @
 \end{figure}
@@ -104,7 +117,7 @@ ps_lbls <- list(
 )
 e_ps <- eval_mthd(dat_pars, ps_lbls, ps_pars, eval_with_pars)
 @
-<<par-search-tbl,cache=FALSE,results='asis'>>=
+<<par-search-tbl,cache=FALSE,results='asis',echo=FALSE>>=
 kable(eval_to_matrix(e_ps))
 @
 
