@@ -141,3 +141,11 @@ f_mkNode <- function(l, r, attr, bnd) {
     class(n) <- "node"
     return(n)
 }
+
+eval_with_pars <- function(data, par) {
+    model <- tree.functional.grow(data$trxs, data$trys, par$nmin, par$minleaf)
+    prys <- tree.functional.classify(data$texs, model)
+    cm <- cm(prys, data$teys)
+    er <- error_rate(cm)
+    return(list(model=model, pred=prys, error=er, cm=cm))
+}

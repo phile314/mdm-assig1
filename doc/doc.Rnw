@@ -37,7 +37,9 @@ library(knitr)
 opts_chunk$set(echo=FALSE)
 
 source('../src/common.r', chdir=TRUE)
-pima <- read_data('../data/pima.txt', 0.0)
+
+dat_perf <- read_data('../data/spambase.data', 0.0)
+dat_pars <- read_data('../data/spambase.data', 0.7)
 
 nrep <- 1
 source('../src/functional.r', chdir=TRUE)
@@ -77,23 +79,34 @@ be parallelized (in general, not necessarily in R).
 \section{Results}
 \subsection{Performance comparison}
 \begin{figure}[!ht]
-<<perf-comp,fig.keep='high',cache=FALSE>>=
-ti_fu_gr <- system.time(replicate(nrep, tree.functional.grow(pima$trxs, pima$trys)))["elapsed"]
-ti_im_gr <- system.time(replicate(nrep, tree.grow(pima$trxs, pima$trys)))["elapsed"]
+<<perf-comp-comp,cache=TRUE,echo=FALSE>>=
+ti_fu_gr <- system.time(replicate(nrep, tree.functional.grow(dat_perf$trxs, dat_perf$trys, 5, 5)))["elapsed"]
+ti_im_gr <- system.time(replicate(nrep, tree.grow(dat_perf$trxs, dat_perf$trys, 5, 5)))["elapsed"]
 
-fu_t <- tree.functional.grow(pima$trxs, pima$trys)
-im_t <- tree.grow(pima$trxs, pima$trys)
+fu_t <- tree.functional.grow(dat_perf$trxs, dat_perf$trys, 5, 5)
+im_t <- tree.grow(dat_perf$trxs, dat_perf$trys, 5, 5)
 
-ti_fu_pr <- system.time(replicate(nrep, tree.functional.classify(pima$trxs, fu_t)))["elapsed"]
-ti_im_pr <- system.time(replicate(nrep, tree.classify(pima$trxs, im_t)))["elapsed"]
-
+ti_fu_pr <- system.time(replicate(nrep, tree.functional.classify(dat_perf$trxs, fu_t)))["elapsed"]
+ti_im_pr <- system.time(replicate(nrep, tree.classify(dat_perf$trxs, im_t)))["elapsed"]
+@
+<<perf-comp-plot,fig.keep='high',cache=FALSE>>=
 barplot(c(ti_fu_gr, ti_im_gr, ti_fu_pr, ti_im_pr), names.arg = c("grow functional", "grow imperative", "predict functional", "predict imperative"))
 @
 \end{figure}
 
 \subsection{Parameter search}
-sdf
-
+<<par-search-comp,cache=TRUE,echo=FALSE>>=
+ps_pars <- list( 
+                list(nmin = 0, minleaf = 0)
+)
+ps_lbls <- list(
+                "nmin = 0, minleaf = 0"
+)
+e_ps <- eval_mthd(dat_pars, ps_lbls, ps_pars, eval_with_pars)
+@
+<<par-search-tbl,cache=FALSE,results='asis'>>=
+kable(eval_to_matrix(e_ps))
+@
 
 
 \begin{thebibliography}{1}

@@ -1,3 +1,5 @@
+library('parallel')
+
 split <- function(s, x, y){
   isRight = x > s
   l = list(x = x[! isRight], y = y[! isRight])
@@ -181,4 +183,60 @@ best.split.of.all <- function(attrs, ys, minleaf = 0, impurity = gini_index){
   fbest <- function(a, b) best.split.on(a, b, minleaf, impurity)
   candidates <- apply(attrs, 2, fbest, ys)
   return(best.split.among(candidates))
+}
+
+# Function: error_rate
+#
+# Arguments
+#   cm : The confusion matrix.
+#
+# Result
+#   The error rate.
+error_rate <- function(cm) {
+    return(1 - (sum(diag(cm)) / sum(cm)))
+}
+
+# Function: cm
+#
+# Arguments
+#   act : Vector of predicted class label.
+#   exp : Vector of exptected class labels
+#
+# The two vectors have the same length.
+#
+# Result
+#   The confusion matrix.
+cm <- function(act, exp) {
+    return(table(act, exp))
+}
+
+# Function: eval_mthd
+#
+# Arguments
+#   data : The data set on which to evaluate the parameters.
+#   lbls : Vector containing the descriptions of the parameters.
+#   vals : The parameter combinations to evaluate.
+#   r    : The evaluation function.
+#
+#
+# Result
+#   A list containing:
+#     all : A list containing the results of calling the `r` function.
+eval_mthd <- function(data, lbls, vals, r) {
+    f <- function(lbl, v) list(par_lbl = lbl, model =r(data, v))
+    all <- (mcmapply(f, lbls, vals, SIMPLIFY = FALSE, mc.cores = detectCores()))
+#    best <- best_model(all)
+    return (list(all = all, lbls = lbls, params = vals))
+}
+
+eval_to_matrix <- function(eres) {
+    N <- length(eres$all)
+    df <- data.frame(   nmin = rep(NA, N),
+                        minLeaf = rep(NA, N),
+                        error = rep(NA, N))
+    for(i in 1:(length(eres$all))) {
+        pr <- eres$params[[i]]
+        df[i, ] <- c(pr$nmin, pr$minleaf, eres$all[[i]]$model$error)
+    }
+    return(df)
 }
