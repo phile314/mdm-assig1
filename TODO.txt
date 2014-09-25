@@ -27,8 +27,6 @@ Notes
 
 Questions
   Efficient partitioning (slicing)
-  We only pick up the best of best of each attribute:
-    Is the right thing to do?
   Ask about corner case: Splits that do not improve the impurity might create
   leaves that have the same label. Is this sensible? Or should we enforce that
   they predict two different class labels.
