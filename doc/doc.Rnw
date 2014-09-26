@@ -36,6 +36,9 @@
 library(knitr)
 opts_chunk$set(echo=FALSE)
 
+do_eval_perf <- FALSE
+do_eval_par <- TRUE
+
 source('../src/common.r', chdir=TRUE)
 
 dat_perf <- read_data('../data/spambase.data', 0.0)
@@ -93,14 +96,21 @@ be parallelized (in general, not necessarily in R).
 \subsection{Performance comparison}
 \begin{figure}[!ht]
 <<perf-comp-comp,cache=TRUE,echo=FALSE>>=
-ti_fu_gr <- system.time(replicate(nrep, tree.functional.grow(dat_perf$trxs, dat_perf$trys, 5, 5)))["elapsed"]
-ti_im_gr <- system.time(replicate(nrep, tree.grow(dat_perf$trxs, dat_perf$trys, 5, 5)))["elapsed"]
+if(do_eval_perf) {
+    ti_fu_gr <- system.time(replicate(nrep, tree.functional.grow(dat_perf$trxs, dat_perf$trys, 5, 5)))["elapsed"]
+    ti_im_gr <- system.time(replicate(nrep, tree.grow(dat_perf$trxs, dat_perf$trys, 5, 5)))["elapsed"]
 
-fu_t <- tree.functional.grow(dat_perf$trxs, dat_perf$trys, 5, 5)
-im_t <- tree.grow(dat_perf$trxs, dat_perf$trys, 5, 5)
+    fu_t <- tree.functional.grow(dat_perf$trxs, dat_perf$trys, 5, 5)
+    im_t <- tree.grow(dat_perf$trxs, dat_perf$trys, 5, 5)
 
-ti_fu_pr <- system.time(replicate(nrep, tree.functional.classify(dat_perf$trxs, fu_t)))["elapsed"]
-ti_im_pr <- system.time(replicate(nrep, tree.classify(dat_perf$trxs, im_t)))["elapsed"]
+    ti_fu_pr <- system.time(replicate(nrep, tree.functional.classify(dat_perf$trxs, fu_t)))["elapsed"]
+    ti_im_pr <- system.time(replicate(nrep, tree.classify(dat_perf$trxs, im_t)))["elapsed"]
+} else {
+    ti_fu_gr <- 0
+    ti_im_gr <- 0
+    ti_fu_pr <- 0
+    ti_im_pr <- 0
+}
 @
 <<perf-comp-plot,fig.keep='high',cache=FALSE,echo=FALSE>>=
 barplot(c(ti_fu_gr, ti_im_gr, ti_fu_pr, ti_im_pr), names.arg = c("grow functional", "grow imperative", "predict functional", "predict imperative"))
@@ -109,12 +119,20 @@ barplot(c(ti_fu_gr, ti_im_gr, ti_fu_pr, ti_im_pr), names.arg = c("grow functiona
 
 \subsection{Parameter search}
 <<par-search-comp,cache=TRUE,echo=FALSE>>=
-ps_pars <- list( 
-                list(nmin = 0, minleaf = 0)
-)
-ps_lbls <- list(
-                "nmin = 0, minleaf = 0"
-)
+nmins <- c(0:9, c(10,12,15), seq(20, 40, 10), seq(50, 300, 30))
+minleafs <- c(0:9, c(10,12,15), seq(20, 40, 10), seq(50, 300, 30))
+ps_pars <- list()
+for(i in 1:length(nmins)) {
+    for(j in 1:length(minleafs)) {
+        # The minleaf constraint implies all nmin constraints for which
+        # nmins <= 2*minleaf holds. Just skip them.
+        if(nmins[i] > 2 * minleafs[j]) {
+            ps_pars[[length(ps_pars) + 1]] <- list(nmin = nmins[i], minleaf = minleafs[j])
+        }
+    }
+}
+# we are not using the labels...
+ps_lbls <- rep(NA, length(ps_pars))
 e_ps <- eval_mthd(dat_pars, ps_lbls, ps_pars, eval_with_pars)
 @
 <<par-search-tbl,cache=FALSE,results='asis',echo=FALSE>>=
