@@ -1,16 +1,11 @@
 Before Thursday
 
-MV       Report about imperative version
 MV       Add documentation to ctree.r
 MV/PH    Finish documentation for common.r
 MV       Look why prediction performs worse for imperative
-MV/PH    Look for suitable data set
-
 
   Only split between consecutive rows with different class (optimization)
   Comparing performance
-
-  Consistency in names of vectors and matrix
 
 After Thursday
   Parameters

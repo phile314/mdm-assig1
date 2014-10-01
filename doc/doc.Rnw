@@ -65,20 +65,29 @@ whereas the second one is inspired by what a functional implementation looks lik
 Both algorithms produce the same results, they may only differ performance-wise.
 
 \subsection{Basic Functions}
-First, we would like to discuss the functions common to both implementations.
-The file \texttt{common.r} contains procedures shared between the two implementations.
+The file \texttt{common.r} contains utility functions common to both the implementations. 
 
-  Binary attributes considered as numerical
-  No optimization in best.split.on due to the nmin constraint
+	\paragraph{\texttt{best.split.on}} 
+	This function computes the best possible split, for a given vector of 
+	attributes. Note that this function supports both numerical and binary 
+	(encoded as 0 and 1) attributes.
+	Since the returned split must  also satisfy the \texttt{minleaf} constraint we 
+	did not adopt the optimization of considering exclusively segment borders, 
+	as they are not compatible.
+
+	\paragraph{\texttt{majority\_vote}}
+	This function computes the majority class prediction for a given vector 
+	containing binary labels (0 and 1). Ties are broken at random.
 
 \subsection{Imperative/R Style}
-The classification tree is implemented as a non-empty data frame with the following columns: \texttt{left}, \texttt{right}, \texttt{label}, \texttt{split}, \texttt{splitCol}. Each row represents either a leaf or an internal node and the first row is the root of the tree.
-The \texttt{leaf} and \texttt{right} field of a node row contains the index of the row of the same data frame at which the correspondent left and right child is to be found.
-The \texttt{split} and \texttt{splitCol} are used by the classify procedure. The first is the threshold value
+The classification tree has been implemented as a non-empty data frame with the following columns: \texttt{left}, \texttt{right}, \texttt{label}, \texttt{split}, \texttt{splitCol}. Each row represents either a leaf or an internal node and the first row is the root of the tree.
+The \texttt{left} and \texttt{right} field of a node row contains the index of the row of the same data frame at which the correspondent left and right child is to be found.
+The \texttt{split} and \texttt{splitCol} are used by the \texttt{classify} procedure. The first is the threshold value
 and the second is the column number of the attribute referred by the first.
 The field \texttt{label} is set to \texttt{na} for node rows.
-Leaves nodes fields are all set to \texttt{na} except for \texttt{label} which contains the predicted class label (0 or 1), computed using majority vote. Ties are broken at random.
-The related source code can be found in the file \texttt{ctree.r}.
+Leaves nodes fields are all set to \texttt{na} except for \texttt{label} which contains the predicted class label (0 or 1), computed using majority vote in the \texttt{grow} procedure.
+
+% TODO Should I describe also grow and classify?
 
 \subsection{Functional Style}
 The functional style version encodes the tree by simulating objects in R. We
