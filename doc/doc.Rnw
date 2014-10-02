@@ -102,6 +102,22 @@ approach is, that the tree is never modified and the recursive approach could ea
 be parallelized (in general, not necessarily in R).
 
 \section{Results}
+\subsection{Data Set description}
+We have tested our implementation with the data set 
+\href{https://archive.ics.uci.edu/ml/datasets/Spambase}{SPAM E-mail Database} \cite{SPAM}.
+The data set contains only continuos and binary attributes and no missing values, 
+thus it's compatible with our implementation.
+We have chosen this data set, because it has a great number of attributes (57)
+thus it can be conviniently analyzed by classification trees, as they automatically
+select relevant attributes.
+The attributes include percentage of specific words or characters and statistics 
+(average, longest sequence, total length) about sequences of capital letters in the email.
+The data set include also a binary attribute that denotes whether an email is spam or not.
+For further information about the data set see \cite{SPAM}.
+We have trained a tree with different settings of the \texttt{nmin} and \texttt{minleaf} 
+parameters using 70\% of our data set (randomly sampled), and we used the remaining 
+30\% for testing. The results are listed in \ref{subsec:params}.
+
 \subsection{Performance comparison}
 \begin{figure}[!ht]
 <<perf-comp-comp,cache=TRUE,echo=FALSE>>=
@@ -127,6 +143,7 @@ barplot(c(ti_fu_gr, ti_im_gr, ti_fu_pr, ti_im_pr), names.arg = c("grow functiona
 \end{figure}
 
 \subsection{Parameter search}
+\label{subsec:params}
 <<par-search-comp,cache=TRUE,echo=FALSE>>=
 nmins <- c(0:9, c(10,12,15), seq(20, 40, 10), seq(50, 300, 30))
 minleafs <- c(0:9, c(10,12,15), seq(20, 40, 10), seq(50, 300, 30))
@@ -151,13 +168,13 @@ kable(eval_to_matrix(e_ps))
 
 \begin{thebibliography}{1}
 
-\bibitem{FS91}
-  Peter W. Frey, David J. Slate.
-  \emph{Letter Recognition Using Holland-Style Adaptive Classifier}.
-  Kluwer Academic Publishers,
-  Machine Learning, 6, 161-182(1991).
-  Tom Dietterich, Boston,
-  1991.
+\bibitem{SPAM}
+  Mark Hopkins, Erik Reeber, George Forman, Jaap Suermondt.
+  \emph{SPAM E-mail Database}.
+  Hewlett-Packard Labs, 1501 Page Mill Rd., 
+  Palo Alto, CA 94304,
+  June-July 1999.
+
 
 \end{thebibliography}
 
