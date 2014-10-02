@@ -1,4 +1,4 @@
-\documentclass[12pt, a4paper, oneside]{report}
+\documentclass[12pt, a4paper, oneside]{article}
 \usepackage{hyperref}
 \usepackage{amsmath}
 \usepackage{multirow}
@@ -66,6 +66,7 @@ Both algorithms produce the same results, they may only differ performance-wise.
 
 \subsection{Basic Functions}
 The file \texttt{common.r} contains utility functions common to both the implementations. 
+In this section we will point out only the peculiarities about some of those functions.
 
 	\paragraph{\texttt{best.split.on}} 
 	This function computes the best possible split, for a given vector of 
@@ -84,10 +85,8 @@ The classification tree has been implemented as a non-empty data frame with the 
 The \texttt{left} and \texttt{right} field of a node row contains the index of the row of the same data frame at which the correspondent left and right child is to be found.
 The \texttt{split} and \texttt{splitCol} are used by the \texttt{classify} procedure. The first is the threshold value
 and the second is the column number of the attribute referred by the first.
-The field \texttt{label} is set to \texttt{na} for node rows.
-Leaves nodes fields are all set to \texttt{na} except for \texttt{label} which contains the predicted class label (0 or 1), computed using majority vote in the \texttt{grow} procedure.
-
-% TODO Should I describe also grow and classify?
+The field \texttt{label} is set to \texttt{NA} for node rows.
+Leaves nodes fields are all set to \texttt{NA} except for \texttt{label} which contains the predicted class label (0 or 1), computed using majority vote in the \texttt{grow} procedure.
 
 \subsection{Functional Style}
 The functional style version encodes the tree by simulating objects in R. We
