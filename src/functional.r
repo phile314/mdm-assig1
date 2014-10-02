@@ -135,13 +135,26 @@ f_mkLeaf <- function(x, y, cl) {
 # A node.
 #
 # Creates a node.
-
 f_mkNode <- function(l, r, attr, bnd) {
     n <- list(chldl=l, chldr=r, attr=attr, bnd=bnd)
     class(n) <- "node"
     return(n)
 }
 
+# Function: eval_with_pars
+#
+# Arguments:
+#   data: The dataset on which to evaluate the algorithm.
+#   par : A list of the parameters to use (nmin, minleaf)
+#
+# Result
+# A list of
+#   model : the fitted tree
+#   pred  : the predicted class label
+#   error : the error rate
+#   cm    : the confusion matrix
+#
+# Evaluates the tree classification algorithm.
 eval_with_pars <- function(data, par) {
     model <- tree.functional.grow(data$trxs, data$trys, par$nmin, par$minleaf)
     prys <- tree.functional.classify(data$texs, model)
