@@ -1,3 +1,5 @@
+library('parallel')
+
 # Function: split(s, x, y)
 # Splits the vectors x and y according to the value of s.
 #
@@ -307,7 +309,7 @@ eval_mthd <- function(data, lbls, vals, r) {
     return (list(all = all, lbls = lbls, params = vals))
 }
 
-eval_to_matrix <- function(eres) {
+eval_to_df <- function(eres) {
     N <- length(eres$all)
     df <- data.frame(   nmin = rep(NA, N),
                         minLeaf = rep(NA, N),

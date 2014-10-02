@@ -3,7 +3,7 @@
 \usepackage{amsmath}
 \usepackage{multirow}
 \usepackage{subcaption}
-
+\usepackage{pdflscape}
 % font size could be 10pt (default), 11pt or 12 pt
 % paper size coulde be letterpaper (default), legalpaper, executivepaper,
 % a4paper, a5paper or b5paper
@@ -32,21 +32,25 @@
 \date{\today} 
 \begin{document}
 
-<<setup, echo=FALSE, cache=TRUE,include=FALSE>>=
+<<setup, echo=FALSE, cache=FALSE,include=FALSE>>=
 library(knitr)
+library(xtable)
 opts_chunk$set(echo=FALSE)
 
+source('../src/common.r', chdir=TRUE)
+source('../src/functional.r', chdir=TRUE)
+source('../src/ctree.r', chdir=TRUE)
+
+@
+<<init, echo=FALSE, cache=TRUE, include=FALSE>>=
 do_eval_perf <- FALSE
 do_eval_par <- TRUE
+nrep <- 1
 
-source('../src/common.r', chdir=TRUE)
 
 dat_perf <- read_data('../data/spambase.data', 0.0)
 dat_pars <- read_data('../data/spambase.data', 0.7)
 
-nrep <- 1
-source('../src/functional.r', chdir=TRUE)
-source('../src/ctree.r', chdir=TRUE)
 @
 
 \maketitle
@@ -127,8 +131,9 @@ barplot(c(ti_fu_gr, ti_im_gr, ti_fu_pr, ti_im_pr), names.arg = c("grow functiona
 \end{figure}
 
 \subsection{Parameter search}
+\begin{landscape}
 <<par-search-comp,cache=TRUE,echo=FALSE>>=
-nmins <- c(0:9, c(10,12,15), seq(20, 40, 10), seq(50, 300, 30))
+nmins <- c(c(0,1,2,3,4,5,6,8,10,15), seq(20, 40, 10), seq(50, 300, 30))
 minleafs <- c(0:9, c(10,12,15), seq(20, 40, 10), seq(50, 300, 30))
 ps_pars <- list()
 for(i in 1:length(nmins)) {
@@ -145,9 +150,14 @@ ps_lbls <- rep(NA, length(ps_pars))
 e_ps <- eval_mthd(dat_pars, ps_lbls, ps_pars, eval_with_pars)
 @
 <<par-search-tbl,cache=FALSE,results='asis',echo=FALSE>>=
-kable(eval_to_matrix(e_ps))
+etab <- eval_to_df(e_ps)
+#ctab <- xtabs(error ~ nmin + minLeaf, data = etab)
+ctab <- with(etab, tapply(error, list(nmin, minLeaf), sum))
+digits <- c(0, rep(3, dim(ctab)[2]))
+tab <- xtable(ctab, digits = digits)
+print(tab, size = "\\footnotesize")
 @
-
+\end{landscape}
 
 \begin{thebibliography}{1}
 
