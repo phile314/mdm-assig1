@@ -1,5 +1,12 @@
 Before Thursday
 
+
+    Use bigger values for nmin,minleaf for param search
+    Add caption, mention best parameters
+    Send email (workspace, source code, report)
+
+
+
 MV       Add documentation to ctree.r
 MV/PH    Finish documentation for common.r
 MV       Look why prediction performs worse for imperative

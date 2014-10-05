@@ -1,4 +1,4 @@
-\documentclass[12pt, a4paper, oneside]{report}
+\documentclass[12pt, a4paper, oneside]{article}
 \usepackage{hyperref}
 \usepackage{amsmath}
 \usepackage{multirow}
@@ -70,6 +70,7 @@ Both algorithms produce the same results, they may only differ performance-wise.
 
 \subsection{Basic Functions}
 The file \texttt{common.r} contains utility functions common to both the implementations. 
+In this section we will point out only the peculiarities about some of those functions.
 
 	\paragraph{\texttt{best.split.on}} 
 	This function computes the best possible split, for a given vector of 
@@ -88,10 +89,8 @@ The classification tree has been implemented as a non-empty data frame with the 
 The \texttt{left} and \texttt{right} field of a node row contains the index of the row of the same data frame at which the correspondent left and right child is to be found.
 The \texttt{split} and \texttt{splitCol} are used by the \texttt{classify} procedure. The first is the threshold value
 and the second is the column number of the attribute referred by the first.
-The field \texttt{label} is set to \texttt{na} for node rows.
-Leaves nodes fields are all set to \texttt{na} except for \texttt{label} which contains the predicted class label (0 or 1), computed using majority vote in the \texttt{grow} procedure.
-
-% TODO Should I describe also grow and classify?
+The field \texttt{label} is set to \texttt{NA} for node rows.
+Leaves nodes fields are all set to \texttt{NA} except for \texttt{label} which contains the predicted class label (0 or 1), computed using majority vote in the \texttt{grow} procedure.
 
 \subsection{Functional Style}
 The functional style version encodes the tree by simulating objects in R. We
@@ -106,6 +105,22 @@ approach is, that the tree is never modified and the recursive approach could ea
 be parallelized (in general, not necessarily in R).
 
 \section{Results}
+\subsection{Data Set description}
+We have tested our implementation with the data set 
+\href{https://archive.ics.uci.edu/ml/datasets/Spambase}{SPAM E-mail Database} \cite{SPAM}.
+The data set contains only continuos and binary attributes and no missing values, 
+thus it's compatible with our implementation.
+We have chosen this data set, because it has a great number of attributes (57)
+thus it can be conviniently analyzed by classification trees, as they automatically
+select relevant attributes.
+The attributes include percentage of specific words or characters and statistics 
+(average, longest sequence, total length) about sequences of capital letters in the email.
+The data set include also a binary attribute that denotes whether an email is spam or not.
+For further information about the data set see \cite{SPAM}.
+We have trained a tree with different settings of the \texttt{nmin} and \texttt{minleaf} 
+parameters using 70\% of our data set (randomly sampled), and we used the remaining 
+30\% for testing. The results are listed in \ref{subsec:params}.
+
 \subsection{Performance comparison}
 \begin{figure}[!ht]
 <<perf-comp-comp,cache=TRUE,echo=FALSE>>=
@@ -128,13 +143,16 @@ if(do_eval_perf) {
 <<perf-comp-plot,fig.keep='high',cache=FALSE,echo=FALSE>>=
 barplot(c(ti_fu_gr, ti_im_gr, ti_fu_pr, ti_im_pr), names.arg = c("grow functional", "grow imperative", "predict functional", "predict imperative"))
 @
+\caption{The performance of the two implementations (less is better).}
 \end{figure}
 
 \subsection{Parameter search}
+\label{subsec:params}
+
 \begin{landscape}
 <<par-search-comp,cache=TRUE,echo=FALSE>>=
-nmins <- c(c(0,1,2,3,4,5,6,8,10,15), seq(20, 40, 10), seq(50, 300, 30))
-minleafs <- c(0:9, c(10,12,15), seq(20, 40, 10), seq(50, 300, 30))
+nmins <- c(0,1,2,3,4,5,6,8,10,15,20,30,40,50,80,110,140,170,200,250,300,400,500,750,1000,1500,2000,3000)
+minleafs <- c(0,1,2,3,4,5,6,8,10,15, 25, 50, 100, 200, 500)
 ps_pars <- list()
 for(i in 1:length(nmins)) {
     for(j in 1:length(minleafs)) {
@@ -157,17 +175,19 @@ digits <- c(0, rep(3, dim(ctab)[2]))
 tab <- xtable(ctab, digits = digits)
 print(tab, size = "\\footnotesize")
 @
+\captionof{table}{The results of the parameter search. The first row indicates the minleaf, the first column the nmin used.}
 \end{landscape}
+%\end{figure}
 
 \begin{thebibliography}{1}
 
-\bibitem{FS91}
-  Peter W. Frey, David J. Slate.
-  \emph{Letter Recognition Using Holland-Style Adaptive Classifier}.
-  Kluwer Academic Publishers,
-  Machine Learning, 6, 161-182(1991).
-  Tom Dietterich, Boston,
-  1991.
+\bibitem{SPAM}
+  Mark Hopkins, Erik Reeber, George Forman, Jaap Suermondt.
+  \emph{SPAM E-mail Database}.
+  Hewlett-Packard Labs, 1501 Page Mill Rd., 
+  Palo Alto, CA 94304,
+  June-July 1999.
+
 
 \end{thebibliography}
 
