@@ -43,9 +43,9 @@ source('../src/ctree.r', chdir=TRUE)
 
 @
 <<init, echo=FALSE, cache=TRUE, include=FALSE>>=
-do_eval_perf <- FALSE
+do_eval_perf <- TRUE
 do_eval_par <- TRUE
-nrep <- 1
+nrep <- 5
 
 
 dat_perf <- read_data('../data/spambase.data', 0.0)
@@ -115,13 +115,53 @@ thus it can be conviniently analyzed by classification trees, as they automatica
 select relevant attributes.
 The attributes include percentage of specific words or characters and statistics 
 (average, longest sequence, total length) about sequences of capital letters in the email.
-The data set include also a binary attribute that denotes whether an email is spam or not.
+The data set also includes a binary attribute that denotes whether an email is spam or not.
 For further information about the data set see \cite{SPAM}.
+
+
+\subsection{Parameter search}
+\label{subsec:params}
 We have trained a tree with different settings of the \texttt{nmin} and \texttt{minleaf} 
 parameters using 70\% of our data set (randomly sampled), and we used the remaining 
-30\% for testing. The results are listed in \ref{subsec:params}.
+30\% for testing. Parameter combinations where the \texttt{minleaf} constraint is stronger
+than the \texttt{nmin} constraint have been omitted, as the variation in \texttt{nmin} is irrelevant in that case.
+
+The results can be seen in table \ref{tbl:par-res}. The best setting for the given dataset is a \texttt{minleaf} of 6
+and a \texttt{nmin} of 15, which gives an error rate of $10.0\%$.
+
+\begin{landscape}
+<<par-search-comp,cache=TRUE,echo=FALSE>>=
+nmins <- c(0,1,2,3,4,5,6,8,10,15,20,30,50,80,110,140,170,200,275,400,500,750,1000,1500,3000)
+minleafs <- c(0,1,2,3,4,5,6,8,10,15, 25, 50, 100, 200, 500)
+ps_pars <- list()
+for(i in 1:length(nmins)) {
+    for(j in 1:length(minleafs)) {
+        # The minleaf constraint implies all nmin constraints for which
+        # nmins <= 2*minleaf holds. Just skip them.
+        if(nmins[i] >= 2 * minleafs[j]) {
+            ps_pars[[length(ps_pars) + 1]] <- list(nmin = nmins[i], minleaf = minleafs[j])
+        }
+    }
+}
+# we are not using the labels...
+ps_lbls <- rep(NA, length(ps_pars))
+e_ps <- eval_mthd(dat_pars, ps_lbls, ps_pars, eval_with_pars)
+@
+<<par-search-tbl,cache=FALSE,results='asis',echo=FALSE>>=
+etab <- eval_to_df(e_ps)
+#ctab <- xtabs(error ~ nmin + minLeaf, data = etab)
+ctab <- with(etab, tapply(error, list(nmin, minLeaf), sum))
+digits <- c(0, rep(3, dim(ctab)[2]))
+tab <- xtable(ctab, digits = digits, caption = "The results of the parameter search. The first row indicates the minleaf, the first column the nmin used.", label = "tbl:par-res")
+print(tab, size = "\\footnotesize")
+@
+\end{landscape}
 
 \subsection{Performance comparison}
+To compare the performance, we executed the growing and predicting functionality on the whole dataset. The given running times
+are the average timings out of 5 runs.
+As can be seen in figure \ref{plot:perf}, growing times are almost identical, while the functional version is faster at
+predicting. Why there is such a difference in the prediction case is an open question.
 \begin{figure}[!ht]
 <<perf-comp-comp,cache=TRUE,echo=FALSE>>=
 if(do_eval_perf) {
@@ -141,43 +181,11 @@ if(do_eval_perf) {
 }
 @
 <<perf-comp-plot,fig.keep='high',cache=FALSE,echo=FALSE>>=
-barplot(c(ti_fu_gr, ti_im_gr, ti_fu_pr, ti_im_pr), names.arg = c("grow functional", "grow imperative", "predict functional", "predict imperative"))
+barplot(c(ti_fu_gr/nrep, ti_im_gr/nrep, ti_fu_pr/nrep, ti_im_pr/nrep), names.arg = c("grow func.", "grow imp.", "predict func.", "predict imp."))
 @
-\caption{The performance of the two implementations (less is better).}
+\caption{The running time (seconds) of the two implementations, less is better.}
+\label{plot:perf}
 \end{figure}
-
-\subsection{Parameter search}
-\label{subsec:params}
-
-\begin{landscape}
-<<par-search-comp,cache=TRUE,echo=FALSE>>=
-nmins <- c(0,1,2,3,4,5,6,8,10,15,20,30,40,50,80,110,140,170,200,250,300,400,500,750,1000,1500,2000,3000)
-minleafs <- c(0,1,2,3,4,5,6,8,10,15, 25, 50, 100, 200, 500)
-ps_pars <- list()
-for(i in 1:length(nmins)) {
-    for(j in 1:length(minleafs)) {
-        # The minleaf constraint implies all nmin constraints for which
-        # nmins <= 2*minleaf holds. Just skip them.
-        if(nmins[i] > 2 * minleafs[j]) {
-            ps_pars[[length(ps_pars) + 1]] <- list(nmin = nmins[i], minleaf = minleafs[j])
-        }
-    }
-}
-# we are not using the labels...
-ps_lbls <- rep(NA, length(ps_pars))
-e_ps <- eval_mthd(dat_pars, ps_lbls, ps_pars, eval_with_pars)
-@
-<<par-search-tbl,cache=FALSE,results='asis',echo=FALSE>>=
-etab <- eval_to_df(e_ps)
-#ctab <- xtabs(error ~ nmin + minLeaf, data = etab)
-ctab <- with(etab, tapply(error, list(nmin, minLeaf), sum))
-digits <- c(0, rep(3, dim(ctab)[2]))
-tab <- xtable(ctab, digits = digits)
-print(tab, size = "\\footnotesize")
-@
-\captionof{table}{The results of the parameter search. The first row indicates the minleaf, the first column the nmin used.}
-\end{landscape}
-%\end{figure}
 
 \begin{thebibliography}{1}
 
