@@ -305,10 +305,17 @@ cm <- function(act, exp) {
 eval_mthd <- function(data, lbls, vals, r) {
     f <- function(lbl, v) list(par_lbl = lbl, model =r(data, v))
     all <- (mcmapply(f, lbls, vals, SIMPLIFY = FALSE, mc.cores = detectCores()))
-#    best <- best_model(all)
     return (list(all = all, lbls = lbls, params = vals))
 }
 
+# Function: eval_to_df
+#
+# Arguments
+#   eres : Result from the eval_mthd function.
+#
+#
+# Result
+#   A data frame representation of the result.
 eval_to_df <- function(eres) {
     N <- length(eres$all)
     df <- data.frame(   nmin = rep(NA, N),
