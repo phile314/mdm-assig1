@@ -112,16 +112,17 @@ tree.classify <- function (x, tr) {
   apply(x, 1, predict, tr)
 }
 
-# Function: is.leaf(node)
-# Determines whether the given row is a leaf or not.
+# Function: is.leaf(tr, i)
+# Determines whether the i-th row of the tree is a leaf.
 #
 # Arguments
-#   node : A row from the tree data structure
+#   tr : A tree data structure
+#   i : An integer representing a valid row number for tr
 #
 # Result: a logical value
-#   TRUE if the node has the field lable set to NA
+#   TRUE if the i-th row in tr has the field label set to NA
 #   FALSE otherwise
-is.leaf <- function(node) (! is.na(node$label))
+is.leaf <- function(tr, i) (! is.na(tr$label[i]))
 
 # Function: predict(x, tr)
 # Predicts the class label for a single attributes input vector
@@ -133,10 +134,8 @@ is.leaf <- function(node) (! is.na(node$label))
 # Result
 #  The binary class label predicted by the trained tree.
 predict <- function(x, tr){
-  node <- tr[1, ]
-  while (!(is.leaf(node))){
-    succ <- if (x[node$splitCol] <= node$split) node$left else node$right
-    node <- tr[succ, ]
-  }
-  return(node$label)
+  i <- 1
+  while (!(is.leaf(tr, i)))
+    i <- if (x[tr$splitCol[i]] <= tr$split[i]) tr$left[i] else tr$right[i]
+  return(tr$label[i])
 }
