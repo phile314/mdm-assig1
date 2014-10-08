@@ -4,12 +4,12 @@ library('parallel')
 # Splits the vectors x and y according to the value of s.
 #
 # Arguments
-#   s : A number representing the threshold value to be used to apply the split  
+#   s : A number representing the threshold value to be used to apply the split
 #   x : A vector containing the values for some binary or numerical attribute
 #   y : A vector containing the respecitve binary class labels for the observations contained in x
 #
 # x and y have the same length.
-# 
+#
 # Result:
 # A list containing the following named fields : left, right, isRight.
 # left and right are also lists containing two named fields (x and y).
@@ -54,7 +54,7 @@ partition <- function(isRight, x, y) {
 # Function: reduction(s, x, y, i)
 # Arguments
 #   s : A number representing a treshold value for a split
-#   x : A numerical vector containing values for a binary/numerical attribute 
+#   x : A numerical vector containing values for a binary/numerical attribute
 #   y : A numerical (binary) vector containing the class labels related to x
 #   i : The impurity function to be used (default = gini_index)
 #
@@ -77,7 +77,7 @@ reduction <- function (s, x, y, i = gini_index){
 #   x : A vector containing the numerical attributes
 #   y : A vector containing the binary class labels
 #   i : The impurity function used (default = gini_index)
-#   
+#
 # The vectors x and y have the same length.
 #
 # Result
@@ -87,50 +87,44 @@ reduction <- function (s, x, y, i = gini_index){
 impurity_reduction <- function (s, x, y, i = gini_index)
   return(i(y) - reduction(s, x, y, i))
 
-# Function: read_data
+# Function: read.data(fileName, test, header)
+# Reads a dataset and split trainining and testing data
 #
 # Arguments:
 #   fileName : The csv file to load. Last column is assumed to be class label.
 #   test     : percent of rows to use for testing
+#   header   : A logic value: does the file has an header?
 #
 # Result
 #   A list of
-#     dat : full dataset
-#     trxs :  attribute values as matrix, training
-#     trys :  vector of class labels,     training
-#     texs :  attribute values as matrix, test
-#     teys :  vector of class labels,     test
-read_data <- function(fileName, test, header = FALSE) {
-    r.dat <- read.csv(fileName, header)
+#     data : a data frame that contains the whole dataset
+#     train.x :  attribute values as matrix (training dataset)
+#     train.y :  vector of class labels (training dataset)
+#     test.x  :  attribute values as matrix, testing dataset)
+#     test.y  :  vector of class labels (testing dataset)
+read.data <- function(fileName, test, header = FALSE) {
+    r.data <- read.csv(fileName, header)
 
-    isTest <- runif(dim(r.dat)[1]) < test
-    r.test <- r.dat[isTest,]
-    r.train <- r.dat[! isTest,]
+    isTest <- runif(dim(r.data)[1]) < test
+    r.test <- r.data[isTest, ]
+    r.train <- r.data[! isTest, ]
 
-    nc <- dim(r.dat)[2]
-    r.trxs <- r.train[,1:(nc - 1), drop = FALSE]
-    r.trys <- r.train[,nc]
-    r.texs <- r.test[,1:(nc-1), drop = FALSE]
-    r.teys <- r.test[,nc]
-    return(list(dat=r.dat,trxs=r.trxs,trys=r.trys,texs=r.texs,teys=r.teys))
-}
-
-# TODO remove
-read.data <- function(filename){
-    r.dat <- read.csv(filename)
-    nc <- dim(r.dat)[2]
-    r.dat.xs <- r.dat[,1:(nc - 1), drop = FALSE]
-    r.dat.ys <- r.dat[,nc]
-    return(list(dat=r.dat,xs=r.dat.xs,ys=r.dat.ys))
+    nc <- dim(r.data)[2]
+    r.train.x <- r.train[, 1:(nc - 1), drop = FALSE]
+    r.train.y <- r.train[,nc]
+    r.test.x <- r.test[, 1:(nc - 1), drop = FALSE]
+    r.test.y <- r.test[, nc]
+    return(list(data = r.data, train.x = r.train.x, train.y = r.train.y,
+                 test.x = r.test.x, test.y = r.test.y))
 }
 
 # Function: gini_index(y)
 # The gini index impurity function for the two-class case
 #
 # Arguments:
-#   y : A binary (numerical) vector, with class labels 0 or 1. 
+#   y : A binary (numerical) vector, with class labels 0 or 1.
 #
-# Result: The value of the gini index impurity function for the given class label vector 
+# Result: The value of the gini index impurity function for the given class label vector
 gini_index <- function(y) {
     n1 <- sum(y)
     n <- NROW(y)
@@ -175,7 +169,7 @@ candidate_splits <- function(x, y, impurity = gini_index){
   x.distinct <- unique(x)
   splits <- lapply(seq_len(length(x.distinct) - 1),
                    function(i) mean(x.distinct[i : (i + 1)]))
-  
+
   with.impurity <- function(s) c(s, impurity_reduction(s, x, y, impurity))
   candidates <- t(vapply(splits, with.impurity , c(1,2)))
   return(candidates)
@@ -196,8 +190,8 @@ is_good_split <- function (nodes, minleaf) {
 
 # Function: best.split(s1, s2)
 # Returns the best of the two splits given.
-# 
-# Arguments 
+#
+# Arguments
 #   s1 s2 : A split object representing a split
 #           The comparison is done on the reduction field.
 best.split <-function(s1, s2){
@@ -210,10 +204,10 @@ best.split <-function(s1, s2){
 }
 
 # Function: best.split.among(splits)
-# 
+#
 # Arguments:
 #   splits: A list of split objects.
-# Output 
+# Output
 #   The split in the list with greater reduction, or NULL
 #   if the list is empty.
 #   The returned split is extended with a new field index containing its
