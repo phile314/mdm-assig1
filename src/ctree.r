@@ -1,3 +1,6 @@
+# This script contains the implementation of classification trees using an
+# imperative approach.
+
 source("common.r")
 
 # Function: tree.grow(x, y, nmin, minleaf, impurity)
@@ -20,7 +23,7 @@ source("common.r")
 #         with the classify function.
 #         A tree is represented as a non-empty data frame containing the following
 #         columns: left, right, label, split, splitCol
-#         The first row represent the row of the tree.
+#         The first row represent the root of the tree.
 tree.grow <- function(x, y, nmin = 0, minleaf = 0, impurity = gini_index){
   # Initialization
   N <- length(y)

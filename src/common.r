@@ -107,7 +107,7 @@ impurity_reduction <- function (s, x, y, i = gini_index)
 read.data <- function(fileName, test, header = FALSE) {
     r.data <- read.csv(fileName, header)
 
-    isTest <- runif(dim(r.data)[1]) < test
+    isTest <- runif(dim(r.data)[1]) < test # TODO Use sample
     r.test <- r.data[isTest, ]
     r.train <- r.data[! isTest, ]
 

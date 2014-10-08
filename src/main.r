@@ -25,3 +25,16 @@ test.credit <- function(){
   credit <- read.data("../data/credit.txt", 0, header = TRUE)
   return(tree.grow(credit$train.x, credit$train.y, nmin = 2, minleaf = 1))
 }
+
+# Example with the dataset of our choice (spambase).
+# A classification tree is grown on 70% of the data set and tested against
+# the remaining 30%. The error rate is returned.
+test.spambase <- function(){
+  sb <- read.data("../data/spambase.data", 0.3)
+  sb.tree <- tree.grow(sb$train.x, sb$train.y, nmin = 6, minleaf = 15)
+  sb.actual <- tree.classify(sb$test.x, sb.tree)
+  sb.expected <- sb$test.y
+  sb.cm <- cm(sb.expected, sb.actual)
+  sb.error <- error_rate(sb.cm)
+  return(sb.error)
+}
