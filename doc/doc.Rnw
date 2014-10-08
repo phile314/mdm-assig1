@@ -4,6 +4,7 @@
 \usepackage{multirow}
 \usepackage{subcaption}
 \usepackage{pdflscape}
+
 % font size could be 10pt (default), 11pt or 12 pt
 % paper size coulde be letterpaper (default), legalpaper, executivepaper,
 % a4paper, a5paper or b5paper
@@ -32,24 +33,10 @@
 \date{\today} 
 \begin{document}
 
-<<setup, echo=FALSE, cache=FALSE,include=FALSE>>=
+<<setup, echo=FALSE, cache=TRUE,include=FALSE>>=
+source('../src/benchmark.r', chdir=TRUE)
 library(knitr)
 library(xtable)
-opts_chunk$set(echo=FALSE)
-
-source('../src/common.r', chdir=TRUE)
-source('../src/functional.r', chdir=TRUE)
-source('../src/ctree.r', chdir=TRUE)
-
-@
-<<init, echo=FALSE, cache=TRUE, include=FALSE>>=
-do_eval_perf <- TRUE
-do_eval_par <- TRUE
-nrep <- 5
-
-
-dat_perf <- read_data('../data/spambase.data', 0.0)
-dat_pars <- read_data('../data/spambase.data', 0.7)
 
 @
 
@@ -115,7 +102,7 @@ thus it can be conviniently analyzed by classification trees, as they automatica
 select relevant attributes.
 The attributes include percentage of specific words or characters and statistics 
 (average, longest sequence, total length) about sequences of capital letters in the email.
-The data set also includes a binary attribute that denotes whether an email is spam or not.
+The data set include also a binary attribute that denotes whether an email is spam or not.
 For further information about the data set see \cite{SPAM}.
 
 
@@ -131,21 +118,7 @@ and a \texttt{nmin} of 15, which gives an error rate of $10.0\%$.
 
 \begin{landscape}
 <<par-search-comp,cache=TRUE,echo=FALSE>>=
-nmins <- c(0,1,2,3,4,5,6,8,10,15,20,30,50,80,110,140,170,200,275,400,500,750,1000,1500,3000)
-minleafs <- c(0,1,2,3,4,5,6,8,10,15, 25, 50, 100, 200, 500)
-ps_pars <- list()
-for(i in 1:length(nmins)) {
-    for(j in 1:length(minleafs)) {
-        # The minleaf constraint implies all nmin constraints for which
-        # nmins <= 2*minleaf holds. Just skip them.
-        if(nmins[i] >= 2 * minleafs[j]) {
-            ps_pars[[length(ps_pars) + 1]] <- list(nmin = nmins[i], minleaf = minleafs[j])
-        }
-    }
-}
-# we are not using the labels...
-ps_lbls <- rep(NA, length(ps_pars))
-e_ps <- eval_mthd(dat_pars, ps_lbls, ps_pars, eval_with_pars)
+e_ps <- search()
 @
 <<par-search-tbl,cache=FALSE,results='asis',echo=FALSE>>=
 etab <- eval_to_df(e_ps)
@@ -160,30 +133,15 @@ print(tab, size = "\\footnotesize")
 \subsection{Performance comparison}
 To compare the performance, we executed the growing and predicting functionality on the whole dataset. The given running times
 are the average timings out of 5 runs.
-As can be seen in figure \ref{plot:perf}, growing times are almost identical, while the functional version is faster at
-predicting. Why there is such a difference in the prediction case is an open question.
+As can be seen in figure \ref{plot:perf}, growing times are almost identical.
 \begin{figure}[!ht]
-<<perf-comp-comp,cache=TRUE,echo=FALSE>>=
-if(do_eval_perf) {
-    ti_fu_gr <- system.time(replicate(nrep, tree.functional.grow(dat_perf$trxs, dat_perf$trys, 5, 5)))["elapsed"]
-    ti_im_gr <- system.time(replicate(nrep, tree.grow(dat_perf$trxs, dat_perf$trys, 5, 5)))["elapsed"]
-
-    fu_t <- tree.functional.grow(dat_perf$trxs, dat_perf$trys, 5, 5)
-    im_t <- tree.grow(dat_perf$trxs, dat_perf$trys, 5, 5)
-
-    ti_fu_pr <- system.time(replicate(nrep, tree.functional.classify(dat_perf$trxs, fu_t)))["elapsed"]
-    ti_im_pr <- system.time(replicate(nrep, tree.classify(dat_perf$trxs, im_t)))["elapsed"]
-} else {
-    ti_fu_gr <- 0
-    ti_im_gr <- 0
-    ti_fu_pr <- 0
-    ti_im_pr <- 0
-}
+<<par-bench-comp,cache=TRUE,echo=FALSE>>=
+bench <- benchmark()
 @
-<<perf-comp-plot,fig.keep='high',cache=FALSE,echo=FALSE>>=
-barplot(c(ti_fu_gr/nrep, ti_im_gr/nrep, ti_fu_pr/nrep, ti_im_pr/nrep), names.arg = c("grow func.", "grow imp.", "predict func.", "predict imp."))
+<<perf-bench-plot,fig.keep='high',cache=FALSE,echo=FALSE>>=
+boxplot(c(bench$grow, bench$classify) names.arg = c("grow functional", "grow imperative", "predict functional", "predict imperative"))
 @
-\caption{The running time (seconds) of the two implementations, less is better.}
+\caption{The running time (seconds) of the two implementations.}
 \label{plot:perf}
 \end{figure}
 

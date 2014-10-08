@@ -34,7 +34,7 @@ test.spambase <- function(){
   sb.tree <- tree.grow(sb$train.x, sb$train.y, nmin = 6, minleaf = 15)
   sb.actual <- tree.classify(sb$test.x, sb.tree)
   sb.expected <- sb$test.y
-  sb.cm <- cm(sb.expected, sb.actual)
+  sb.cm <- table(sb.expected, sb.actual)
   sb.error <- error_rate(sb.cm)
   return(sb.error)
 }
