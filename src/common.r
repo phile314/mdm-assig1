@@ -94,7 +94,7 @@ impurity_reduction <- function (s, x, y, i = gini_index)
 #
 # Arguments:
 #   fileName : The csv file to load. Last column is assumed to be class label.
-#   test     : percent of rows to use for testing
+#   test     : A number in [0,1] that represents the percent of rows to use for testing
 #   header   : A logic value: does the file has an header?
 #
 # Result
@@ -107,9 +107,9 @@ impurity_reduction <- function (s, x, y, i = gini_index)
 read.data <- function(fileName, test, header = FALSE) {
     r.data <- read.csv(fileName, header)
 
-    isTest <- runif(dim(r.data)[1]) < test # TODO Use sample
+    isTest <- sample(nrow(r.data), test * nrow(r.data))
     r.test <- r.data[isTest, ]
-    r.train <- r.data[! isTest, ]
+    r.train <- if (is.integer(isTest)) r.data else r.data[-isTest, ]
 
     nc <- dim(r.data)[2]
     r.train.x <- r.train[, 1:(nc - 1), drop = FALSE]
