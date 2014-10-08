@@ -139,7 +139,7 @@ As can be seen in figure \ref{plot:perf}, growing times are almost identical.
 bench <- benchmark()
 @
 <<perf-bench-plot,fig.keep='high',cache=FALSE,echo=FALSE>>=
-boxplot(c(bench$grow, bench$classify) names.arg = c("grow functional", "grow imperative", "predict functional", "predict imperative"))
+boxplot(c(bench$grow, bench$classify) names = c("grow functional", "grow imperative", "predict functional", "predict imperative"))
 @
 \caption{The running time (seconds) of the two implementations.}
 \label{plot:perf}
