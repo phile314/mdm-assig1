@@ -30,8 +30,8 @@ tree.grow <- function(x, y, nmin = 0, minleaf = 0, impurity = gini_index){
                      split = rep(NA, N),
                      splitCol = rep(NA, N))
   tree[1, ] <- mkLeaf(y)
-  worklist <- list(1) # List of leaves indexes that still needs to be split
-  samples <- list()
+  worklist <- list(1) # List of leaves indexes that still need to be split
+  samples <- list() # Observations row indexes contained by each leaf
   samples[[1]] <- 1:length(y)
   freeRow <- 2
 
