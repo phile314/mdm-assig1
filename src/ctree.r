@@ -26,11 +26,11 @@ tree.grow <- function(x, y, nmin = 0, minleaf = 0, impurity = gini_index){
   N <- length(y)
   tree <- data.frame(left = rep(NA,N),
                      right = rep(NA, N),
-                     label = rep(NA,N), # logical? (binary classification)
+                     label = rep(NA,N),
                      split = rep(NA, N),
                      splitCol = rep(NA, N))
   tree[1, ] <- mkLeaf(y)
-  worklist <- list(1)
+  worklist <- list(1) # List of leaves indexes that still needs to be split
   samples <- list()
   samples[[1]] <- 1:length(y)
   freeRow <- 2
@@ -46,13 +46,13 @@ tree.grow <- function(x, y, nmin = 0, minleaf = 0, impurity = gini_index){
       best <- best.split.of.all(x.current, y.current, minleaf, impurity)
 
       if (is.null(best))
-        next # TODO clean samples ? doesn't seem necessary
+        next
 
       # Make leaves
       left.index <- freeRow
       right.index <- freeRow + 1
       tree[left.index ,] <- mkLeaf(y.current[!best$isRight])
-      tree[right.index,] <- mkLeaf(y.current[best$isRight]) # TODO should we always enforce two different class labels?!
+      tree[right.index,] <- mkLeaf(y.current[best$isRight])
 
       # Split samples
       samples[[left.index]] <- current.samples[!best$isRight]
@@ -68,6 +68,19 @@ tree.grow <- function(x, y, nmin = 0, minleaf = 0, impurity = gini_index){
   }
   return(tree[1:(freeRow - 1), ])
 }
+
+
+# Function: tree.classify(x, tr)
+# Predicts the class label for each row in the input attributes matrix.
+#
+# Arguments
+#   x : A matrix with the same number of columns as the matrix used to train tr
+#   tr : A tree object produced by the tree.grow function
+#
+# Result
+#   A vector of binary class labels. It contains the predicted class label
+#   for each row in x.
+tree.classify <- function (x, tr) apply(x, 1, predict, tr)
 
 
 # Function: mkLeaf(y)
@@ -99,19 +112,6 @@ mkLeaf <- function(y) c(NA, NA, majority_class(y), NA, NA)
 mkNode <- function (left.index, right.index, best) {
   c(left.index, right.index, NA, best$split, best$index)
 }
-
-
-# Function: tree.classify(x, tr)
-# Predicts the class label for each row in the input attributes matrix.
-#
-# Arguments
-#   x : A matrix with the same number of columns as the matrix used to train tr
-#   tr : A tree object produced by the tree.grow function
-#
-# Result
-#   A vector of binary class labels. It contains the predicted class label
-#   for each row in x.
-tree.classify <- function (x, tr) apply(x, 1, predict, tr)
 
 
 # Function: predict(x, tr)

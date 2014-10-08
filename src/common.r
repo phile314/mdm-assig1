@@ -1,3 +1,5 @@
+# This script contains utility functions common to all the other scripts.
+
 library('parallel')
 
 # Function: split(s, x, y)
