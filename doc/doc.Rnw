@@ -37,7 +37,6 @@
 source('../src/benchmark.r', chdir=TRUE)
 library(knitr)
 library(xtable)
-
 @
 
 \maketitle
@@ -117,9 +116,11 @@ The results can be seen in table \ref{tbl:par-res}. The best setting for the giv
 and a \texttt{nmin} of 15, which gives an error rate of $10.0\%$.
 
 \begin{landscape}
+
 <<par-search-comp,cache=TRUE,echo=FALSE>>=
-e_ps <- search()
+e_ps <- search.params()
 @
+
 <<par-search-tbl,cache=FALSE,results='asis',echo=FALSE>>=
 etab <- eval_to_df(e_ps)
 #ctab <- xtabs(error ~ nmin + minLeaf, data = etab)
@@ -139,7 +140,7 @@ As can be seen in figure \ref{plot:perf}, growing times are almost identical.
 bench <- benchmark()
 @
 <<perf-bench-plot,fig.keep='high',cache=FALSE,echo=FALSE>>=
-boxplot(c(bench$grow, bench$classify) names = c("grow functional", "grow imperative", "predict functional", "predict imperative"))
+boxplot(c(bench$grow, bench$classify), names = c("grow functional", "grow imperative", "predict functional", "predict imperative"))
 @
 \caption{The running time (seconds) of the two implementations.}
 \label{plot:perf}
