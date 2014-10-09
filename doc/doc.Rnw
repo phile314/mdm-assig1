@@ -116,8 +116,8 @@ is computed using the remaining 30\% as testing data set.
 Parameter combinations where the \texttt{minleaf} constraint is stronger
 than the \texttt{nmin} constraint have been omitted, as the variation in \texttt{nmin} 
 is irrelevant in that case.  The results can be seen in table \ref{tbl:par-res}. 
-The best setting for the given dataset is a \texttt{minleaf} of 6
-and a \texttt{nmin} of 15, which gives an error rate of $10.0\%$.
+The best setting for the given dataset is a \texttt{minleaf} of 4
+and a \texttt{nmin} of 8, which gives an error rate of $8.7\%$.
 
 \begin{landscape}
 
@@ -140,10 +140,12 @@ The script \texttt{benchmark} contains the function \texttt{benchmark.tree}, whi
 running time of the two implementations, using the library \texttt{microbenchmark}.
 The benchmark has been performed on the whole Pima indians data set, on both \texttt{grow} and
 \texttt{classify} functions. Each function has been run 5 times.
-As can be seen in figure \ref{plot:perf}, growing times does not differ significantly,
-the imperative version being about a decisecond slower. In prediction the imperative
-implementation is slightly faster, taking about ten microseconds less than the functional
+As can be seen in figures \ref{plot:perf1} and \ref{plot:perf2}, growing times does not differ significantly,
+the imperative version being minimally slower. In prediction the imperative
+implementation is faster, taking almost 200 microseconds less than the functional
 one.
+We would like to note that performance may vary significantly if executed with different R versions
+or hardware. The numbers listed below were produced with R version 3.1.1 on an eight core 3.6GHz processor.
 
 \begin{figure}[!ht]
 <<par-bench-comp,cache=TRUE,echo=FALSE>>=
@@ -152,10 +154,17 @@ bench <- benchmark.tree()
 <<perf-bench-plot,fig.keep='high',cache=FALSE,echo=FALSE>>=
 boxplot(bench$grow, names = c("grow functional", "grow imperative"),
         xlab = "", ylab = "log(time) [s]")
+@
+\caption{Growing performace of both algorithms.}
+\label{plot:perf1}
+\end{figure}
+\begin{figure}[!ht]
+<<par-bench-plot2,fig.keep='high',cache=FALSE,echo=FALSE>>=
 boxplot(bench$classify, names = c("predict functional", "predict imperative"), 
         xlab = "", ylab = expression(paste("log(time) [", ~ mu, "s]")))
 @
-\label{plot:perf}
+\caption{Predicting performance of both algorithms.}
+\label{plot:perf2}
 \end{figure}
 
 \begin{thebibliography}{1}
