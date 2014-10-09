@@ -107,7 +107,7 @@ read.data <- function(fileName, test, header = FALSE) {
 
     isTest <- sample(nrow(r.data), test * nrow(r.data))
     r.test <- r.data[isTest, ]
-    r.train <- if (is.integer(isTest)) r.data else r.data[-isTest, ]
+    r.train <- if (test == 0) r.data else r.data[-isTest, ]
 
     nc <- dim(r.data)[2]
     r.train.x <- r.train[, 1:(nc - 1), drop = FALSE]

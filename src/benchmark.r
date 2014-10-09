@@ -22,7 +22,7 @@ benchmark <- function(){
 
   bench.classify <- microbenchmark(tree.classify(pima$test.x, imp.tree),
                                    tree.functional.classify(pima$test.x, fun.tree),
-                                   times = 10)
+                                   times = 5)
   return(list(grow = bench.grow, classify = bench.classify))
 }
 
