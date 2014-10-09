@@ -33,7 +33,7 @@
 \date{\today} 
 \begin{document}
 
-<<setup, echo=FALSE, cache=TRUE,include=FALSE>>=
+<<setup, echo=FALSE, cache=FALSE,include=FALSE>>=
 source('../src/benchmark.r', chdir=TRUE)
 library(knitr)
 library(xtable)
