@@ -11,8 +11,8 @@ source("functional.r")
 # Benchmark
 ################################################################################
 
-benchmark <- function(){
-  pima <- read.data('../data/pima.txt', 0.3)
+benchmark.tree <- function(){
+  pima <- read.data('../data/pima.txt', 0)
   bench.grow <- microbenchmark(tree.grow(pima$train.x, pima$train.y, 20, 5),
                                tree.functional.grow(pima$train.x, pima$train.y, 20, 5),
                                times = 5)

@@ -61,7 +61,8 @@ In this section we will point out only the peculiarities about some of those fun
 	\paragraph{\texttt{best.split.on}} 
 	This function computes the best possible split, for a given vector of 
 	attributes. Note that this function supports both numerical and binary 
-	(encoded as 0 and 1) attributes.
+	(encoded as 0 and 1) attributes. Splits on binary attributes have threshold
+  value 0.5.
 	Since the returned split must  also satisfy the \texttt{minleaf} constraint we 
 	did not adopt the optimization of considering exclusively segment borders, 
 	as they are not compatible.
@@ -73,17 +74,17 @@ In this section we will point out only the peculiarities about some of those fun
 \subsection{Imperative/R Style}
 The classification tree has been implemented as a non-empty data frame with the following columns: \texttt{left}, \texttt{right}, \texttt{label}, \texttt{split}, \texttt{splitCol}. Each row represents either a leaf or an internal node and the first row is the root of the tree.
 The \texttt{left} and \texttt{right} field of a node row contains the index of the row of the same data frame at which the correspondent left and right child is to be found.
-The \texttt{split} and \texttt{splitCol} are used by the \texttt{classify} procedure. The first is the threshold value
-and the second is the column number of the attribute referred by the first.
+The \texttt{split} and \texttt{splitCol} are used by the \texttt{classify} procedure. 
+The former is the threshold value and the latter is the column number of the attribute referred by the first.
 The field \texttt{label} is set to \texttt{NA} for node rows.
 Leaves nodes fields are all set to \texttt{NA} except for \texttt{label} which contains the predicted class label (0 or 1), computed using majority vote in the \texttt{grow} procedure.
 
 \subsection{Functional Style}
-The functional style version encodes the tree by simulating objects in R. We
-would like to note that R is not perfectly suited for this approach, but it
-should give some indications how such an approach compares in term of
-performance to a more procedural/imperative approach. The source code can
-be found in the file \texttt{functional.r}.
+The functional style version encodes the tree by simulating objects in R, 
+using \texttt{S3} class. We would like to note that R is not perfectly 
+suited for this approach, but it should give some indications how such an 
+approach compares in term of performance to a more procedural/imperative approach. 
+The source code can be found in the file \texttt{functional.r}.
 
 The implementation basically uses recursion to construct the tree, which happens
 in the \texttt{tree.functional.grow} function. A nice side effect of the functional
@@ -99,20 +100,23 @@ thus it's compatible with our implementation.
 We have chosen this data set, because it has a great number of attributes (57)
 thus it can be conviniently analyzed by classification trees, as they automatically
 select relevant attributes.
-The attributes include percentage of specific words or characters and statistics 
-(average, longest sequence, total length) about sequences of capital letters in the email.
-The data set include also a binary attribute that denotes whether an email is spam or not.
+The attributes include percentage of specific words or characters present in the emails 
+and statistics (average, longest sequence, total length) about sequences of capital 
+letters in the email. The data set include also a binary attribute that denotes 
+whether an email is spam or not. The data set consists of 4601 instances.
 For further information about the data set see \cite{SPAM}.
 
 
 \subsection{Parameter search}
 \label{subsec:params}
-We have trained a tree with different settings of the \texttt{nmin} and \texttt{minleaf} 
-parameters using 70\% of our data set (randomly sampled), and we used the remaining 
-30\% for testing. Parameter combinations where the \texttt{minleaf} constraint is stronger
-than the \texttt{nmin} constraint have been omitted, as the variation in \texttt{nmin} is irrelevant in that case.
-
-The results can be seen in table \ref{tbl:par-res}. The best setting for the given dataset is a \texttt{minleaf} of 6
+The script \texttt{benchmark.r} contains the function \texttt{search.params} which
+trains a classification tree with different settings of the \texttt{nmin} and \texttt{minleaf} 
+parameters using 70\% of our data set (randomly sampled). The corresponding error rate
+is computed using the remaining 30\% as testing data set. 
+Parameter combinations where the \texttt{minleaf} constraint is stronger
+than the \texttt{nmin} constraint have been omitted, as the variation in \texttt{nmin} 
+is irrelevant in that case.  The results can be seen in table \ref{tbl:par-res}. 
+The best setting for the given dataset is a \texttt{minleaf} of 6
 and a \texttt{nmin} of 15, which gives an error rate of $10.0\%$.
 
 \begin{landscape}
@@ -132,17 +136,25 @@ print(tab, size = "\\footnotesize")
 \end{landscape}
 
 \subsection{Performance comparison}
-To compare the performance, we executed the growing and predicting functionality on the whole dataset. The given running times
-are the average timings out of 5 runs.
-As can be seen in figure \ref{plot:perf}, growing times are almost identical.
+The script \texttt{benchmark} contains the function \texttt{benchmark.tree}, which compares the 
+running time of the two implementations, using the library \texttt{microbenchmark}.
+The benchmark has been performed on the whole Pima indians data set, on both \texttt{grow} and
+\texttt{classify} functions. Each function has been run 5 times.
+As can be seen in figure \ref{plot:perf}, growing times does not differ significantly,
+the imperative version being about a decisecond slower. In prediction the imperative
+implementation is slightly faster, taking about ten microseconds less than the functional
+one.
+
 \begin{figure}[!ht]
 <<par-bench-comp,cache=TRUE,echo=FALSE>>=
-bench <- benchmark()
+bench <- benchmark.tree()
 @
 <<perf-bench-plot,fig.keep='high',cache=FALSE,echo=FALSE>>=
-boxplot(c(bench$grow, bench$classify), names = c("grow functional", "grow imperative", "predict functional", "predict imperative"))
+boxplot(bench$grow, names = c("grow functional", "grow imperative"),
+        xlab = "", ylab = "log(time) [s]")
+boxplot(bench$classify, names = c("predict functional", "predict imperative"), 
+        xlab = "", ylab = expression(paste("log(time) [", ~ mu, "s]")))
 @
-\caption{The running time (seconds) of the two implementations.}
 \label{plot:perf}
 \end{figure}
 
